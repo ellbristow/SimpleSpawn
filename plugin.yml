@@ -1,6 +1,6 @@
 name: SimpleSpawn
 main: me.ellbristow.SimpleSpawn.SimpleSpawn
-version: 0.1
+version: 1.0
 author: ellbristow
 description: >
              Set the world's spawn location.

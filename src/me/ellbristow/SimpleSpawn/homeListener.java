@@ -6,11 +6,13 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerBedEnterEvent;
-import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerRespawnEvent;
 
-public class homeListener extends PlayerListener {
+public class homeListener implements Listener {
 	
 	public static SimpleSpawn plugin;
 	public final Logger logger = Logger.getLogger("Minecraft");
@@ -19,6 +21,7 @@ public class homeListener extends PlayerListener {
 		plugin = instance;
 	}
 	
+	@EventHandler (priority = EventPriority.NORMAL)
 	public void onPlayerRespawn (PlayerRespawnEvent event) {
 		Player player = event.getPlayer();
 		World homeWorld = plugin.getServer().getWorld(plugin.usersConfig.getString(player.getName().toLowerCase() + ".world", plugin.getServer().getWorlds().get(0).getName()));
@@ -29,6 +32,7 @@ public class homeListener extends PlayerListener {
 		event.setRespawnLocation(spawnLoc);
 	}
 	
+	@EventHandler (priority = EventPriority.NORMAL)
 	public void onPlayerBedEnter (PlayerBedEnterEvent event) {
 		Player player = event.getPlayer();
 		plugin.usersConfig.set(player.getName().toLowerCase() + ".world", player.getWorld().getName());

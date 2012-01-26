@@ -13,7 +13,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -38,8 +37,7 @@ public class SimpleSpawn extends JavaPlugin {
 		logger.info("[" + pdfFile.getName() + "] version " + pdfFile.getVersion() + " is now enabled.");
 		usersConfig = this.getUsersConfig();
 		PluginManager pm = getServer().getPluginManager();
-		pm.registerEvent(Event.Type.PLAYER_RESPAWN, homeListener, Event.Priority.Normal, this);
-		pm.registerEvent(Event.Type.PLAYER_BED_ENTER, homeListener, Event.Priority.Normal, this);
+		pm.registerEvents(homeListener, this);
 	}
 	
 	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
