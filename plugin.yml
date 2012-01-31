@@ -1,7 +1,8 @@
 name: SimpleSpawn
 main: me.ellbristow.SimpleSpawn.SimpleSpawn
-version: 1.0
+version: 1.0.1
 author: ellbristow
+dev-url: http://dev.bukkit.org/server-mods/simplespawn
 description: >
              Set the world's spawn location.
 commands:

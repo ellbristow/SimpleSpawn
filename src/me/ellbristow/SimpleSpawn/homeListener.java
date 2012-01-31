@@ -28,7 +28,9 @@ public class homeListener implements Listener {
 		double homeX = plugin.usersConfig.getDouble(player.getName().toLowerCase() + ".x", player.getWorld().getSpawnLocation().getX());
 		double homeY = plugin.usersConfig.getDouble(player.getName().toLowerCase() + ".y", player.getWorld().getSpawnLocation().getY());
 		double homeZ = plugin.usersConfig.getDouble(player.getName().toLowerCase() + ".z", player.getWorld().getSpawnLocation().getZ());
-		Location spawnLoc = new Location(homeWorld, homeX, homeY, homeZ);
+		float homeYaw = (float)plugin.usersConfig.getDouble(player.getName().toLowerCase() + ".yaw", player.getWorld().getSpawnLocation().getYaw());
+		float homePitch = (float)plugin.usersConfig.getDouble(player.getName().toLowerCase() + ".pitch", player.getWorld().getSpawnLocation().getPitch());
+		Location spawnLoc = new Location(homeWorld, homeX, homeY, homeZ, homeYaw, homePitch);
 		event.setRespawnLocation(spawnLoc);
 	}
 	
@@ -39,6 +41,8 @@ public class homeListener implements Listener {
 		plugin.usersConfig.set(player.getName().toLowerCase() + ".x", (int) player.getLocation().getX());
 		plugin.usersConfig.set(player.getName().toLowerCase() + ".y", (int) player.getLocation().getY());
 		plugin.usersConfig.set(player.getName().toLowerCase() + ".z", (int) player.getLocation().getZ());
+		plugin.usersConfig.set(player.getName().toLowerCase() + ".yaw", (int) player.getLocation().getYaw());
+		plugin.usersConfig.set(player.getName().toLowerCase() + ".pitch", (int) player.getLocation().getPitch());
 		plugin.saveUsersConfig();
 		player.sendMessage(ChatColor.GOLD + "Your home has been set to this location!");
 	}

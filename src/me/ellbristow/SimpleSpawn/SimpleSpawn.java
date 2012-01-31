@@ -50,6 +50,8 @@ public class SimpleSpawn extends JavaPlugin {
 			if (player.hasPermission("simplespawn.set")) {
 				String world = player.getWorld().getName();
 				getServer().getWorld(world).setSpawnLocation((int)player.getLocation().getX(), (int)player.getLocation().getY(), (int)player.getLocation().getZ());
+				usersConfig.set(world + ".yaw", (double)player.getLocation().getYaw());
+				usersConfig.set(world + ".pitch", (double)player.getLocation().getPitch());
 				player.sendMessage(ChatColor.GOLD + "Spawn been set to this location for this world!");
 				return true;
 			}
@@ -63,6 +65,10 @@ public class SimpleSpawn extends JavaPlugin {
 			if (player.hasPermission("simplespawn.use")) {
 				String world = player.getWorld().getName();
 				Location spawnLoc = getServer().getWorld(world).getSpawnLocation();
+				float worldYaw = (float)usersConfig.getDouble(world + ".yaw", player.getWorld().getSpawnLocation().getYaw());
+				float worldPitch = (float)usersConfig.getDouble(world + ".pitch", player.getWorld().getSpawnLocation().getPitch());
+				spawnLoc.setYaw(worldYaw);
+				spawnLoc.setPitch(worldPitch);
 				player.teleport(spawnLoc);
 				player.sendMessage(ChatColor.GOLD + "WHOOSH!");
 				return true;
@@ -79,6 +85,8 @@ public class SimpleSpawn extends JavaPlugin {
 				usersConfig.set(player.getName().toLowerCase() + ".x", player.getLocation().getX());
 				usersConfig.set(player.getName().toLowerCase() + ".y", player.getLocation().getY());
 				usersConfig.set(player.getName().toLowerCase() + ".z", player.getLocation().getZ());
+				usersConfig.set(player.getName().toLowerCase() + ".yaw", (double)player.getLocation().getYaw());
+				usersConfig.set(player.getName().toLowerCase() + ".pitch", (double)player.getLocation().getPitch());
 				saveUsersConfig();
 				player.sendMessage(ChatColor.GOLD + "Your home has been set to this location!");
 				return true;
@@ -95,7 +103,9 @@ public class SimpleSpawn extends JavaPlugin {
 				double homeX = usersConfig.getDouble(player.getName().toLowerCase() + ".x", player.getWorld().getSpawnLocation().getX());
 				double homeY = usersConfig.getDouble(player.getName().toLowerCase() + ".y", player.getWorld().getSpawnLocation().getY());
 				double homeZ = usersConfig.getDouble(player.getName().toLowerCase() + ".z", player.getWorld().getSpawnLocation().getZ());
-				Location homeLoc = new Location(homeWorld, homeX, homeY, homeZ);
+				float homeYaw = (float)usersConfig.getDouble(player.getName().toLowerCase() + ".yaw", player.getWorld().getSpawnLocation().getYaw());
+				float homePitch = (float)usersConfig.getDouble(player.getName().toLowerCase() + ".pitch", player.getWorld().getSpawnLocation().getPitch());
+				Location homeLoc = new Location(homeWorld, homeX, homeY, homeZ, homeYaw, homePitch);
 				player.teleport(homeLoc);
 				player.sendMessage(ChatColor.GOLD + "WHOOSH!");
 				return true;
