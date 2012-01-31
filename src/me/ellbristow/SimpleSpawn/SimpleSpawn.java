@@ -52,6 +52,7 @@ public class SimpleSpawn extends JavaPlugin {
 				getServer().getWorld(world).setSpawnLocation((int)player.getLocation().getX(), (int)player.getLocation().getY(), (int)player.getLocation().getZ());
 				usersConfig.set(world + ".yaw", (double)player.getLocation().getYaw());
 				usersConfig.set(world + ".pitch", (double)player.getLocation().getPitch());
+				saveUsersConfig();
 				player.sendMessage(ChatColor.GOLD + "Spawn been set to this location for this world!");
 				return true;
 			}
