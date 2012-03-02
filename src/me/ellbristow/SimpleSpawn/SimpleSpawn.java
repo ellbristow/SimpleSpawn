@@ -2,7 +2,7 @@ package me.ellbristow.SimpleSpawn;
 
 import java.io.File;
 import java.io.IOException;
-
+import java.util.logging.Level;
 import org.bukkit.ChatColor;
 import org.bukkit.Effect;
 import org.bukkit.Location;
@@ -50,6 +50,7 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
 		pm.registerEvents(this, this);
 	}
 	
+        @Override
 	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
 		if (commandLabel.equalsIgnoreCase("setspawn")) {
 			if (!(sender instanceof Player)) {
@@ -191,7 +192,7 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
 		try {
 			usersConfig.save(usersFile);
 		} catch (IOException ex) {
-			getLogger().severe("Could not save " + usersFile + "!");
+			getLogger().log(Level.SEVERE, "Could not save {0}!", usersFile);
 		}
 	}
 	
