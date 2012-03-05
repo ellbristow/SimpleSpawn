@@ -26,7 +26,7 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
 	protected FileConfiguration config;
 	public FileConfiguration usersConfig = null;
 	public File usersFile = null;
-	public int tpEffect = 3; // 3 = off
+	public int tpEffect = 4; // 4 = off
 
 	@Override
 	public void onDisable() {
@@ -60,6 +60,7 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
 			Player player = (Player) sender;
 			if (player.hasPermission("simplespawn.set")) {
 				String world = player.getWorld().getName();
+                                player.getWorld().setSpawnLocation((int)player.getLocation().getX(), (int)player.getLocation().getY(), (int)player.getLocation().getZ());
 				usersConfig.set(world + ".x", (double)player.getLocation().getX());
 				usersConfig.set(world + ".y", (double)player.getLocation().getY());
 				usersConfig.set(world + ".z", (double)player.getLocation().getZ());
@@ -119,29 +120,43 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
 		switch (tpEffect) {
 		case 0:
 			player.getWorld().strikeLightningEffect(leftLoc);
-			loc.getWorld().strikeLightningEffect(loc);
 		break;
 		default:
 			leftLoc.setY(leftLoc.getY() + 1);
-			Location newLoc = new Location(loc.getWorld(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
-			newLoc.setY(newLoc.getY() + 1);
-			switch (tpEffect) {
+                        switch (tpEffect) {
 			case 1:
 				leftLoc.getWorld().playEffect(leftLoc, Effect.ENDER_SIGNAL, 0);
-				newLoc.getWorld().playEffect(newLoc, Effect.ENDER_SIGNAL, 0);
 			break;
 			case 2:
 				leftLoc.getWorld().playEffect(leftLoc, Effect.SMOKE, 0);
-				newLoc.getWorld().playEffect(newLoc, Effect.SMOKE, 0);
 			break;
 			case 3:
 				leftLoc.getWorld().playEffect(leftLoc, Effect.MOBSPAWNER_FLAMES, 0);
-				newLoc.getWorld().playEffect(newLoc, Effect.MOBSPAWNER_FLAMES, 0);
 			break;
 			}
 		break;
 		}
 		player.teleport(loc);
+                switch (tpEffect) {
+		case 0:
+			loc.getWorld().strikeLightningEffect(loc);
+		break;
+		default:
+			Location newLoc = new Location(loc.getWorld(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
+			newLoc.setY(newLoc.getY() + 1);
+                        switch (tpEffect) {
+			case 1:
+				newLoc.getWorld().playEffect(newLoc, Effect.ENDER_SIGNAL, 0);
+			break;
+			case 2:
+				newLoc.getWorld().playEffect(newLoc, Effect.SMOKE, 0);
+			break;
+			case 3:
+				newLoc.getWorld().playEffect(newLoc, Effect.MOBSPAWNER_FLAMES, 0);
+			break;
+			}
+		break;
+		}
 		player.sendMessage(ChatColor.GOLD + "WHOOSH!");
 	}
 	
