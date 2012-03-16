@@ -17,6 +17,8 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -223,4 +225,53 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
 	public void onPlayerBedEnter (PlayerBedEnterEvent event) {
 		setHomeLoc(event.getPlayer());
 	}
+        
+        @EventHandler (priority = EventPriority.NORMAL)
+	public void onPlayerTeleport (PlayerTeleportEvent event) {
+            if (event.getCause().equals(TeleportCause.COMMAND)) {
+                Location leftLoc = event.getFrom();
+                Player player = event.getPlayer();
+                switch (tpEffect) {
+                case 0:
+                        player.getWorld().strikeLightningEffect(leftLoc);
+                break;
+                default:
+                        leftLoc.setY(leftLoc.getY() + 1);
+                        switch (tpEffect) {
+                        case 1:
+                                leftLoc.getWorld().playEffect(leftLoc, Effect.ENDER_SIGNAL, 0);
+                        break;
+                        case 2:
+                                leftLoc.getWorld().playEffect(leftLoc, Effect.SMOKE, 0);
+                        break;
+                        case 3:
+                                leftLoc.getWorld().playEffect(leftLoc, Effect.MOBSPAWNER_FLAMES, 0);
+                        break;
+                        }
+                break;
+                }
+                Location loc = event.getTo();
+                switch (tpEffect) {
+                case 0:
+                        loc.getWorld().strikeLightningEffect(loc);
+                break;
+                default:
+                        Location newLoc = new Location(loc.getWorld(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
+                        newLoc.setY(newLoc.getY() + 1);
+                        switch (tpEffect) {
+                        case 1:
+                                newLoc.getWorld().playEffect(newLoc, Effect.ENDER_SIGNAL, 0);
+                        break;
+                        case 2:
+                                newLoc.getWorld().playEffect(newLoc, Effect.SMOKE, 0);
+                        break;
+                        case 3:
+                                newLoc.getWorld().playEffect(newLoc, Effect.MOBSPAWNER_FLAMES, 0);
+                        break;
+                        }
+                break;
+                }
+                player.sendMessage(ChatColor.GOLD + "WHOOSH!");
+            }
+        }
 }
