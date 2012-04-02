@@ -1,41 +1,71 @@
 name: SimpleSpawn
 main: me.ellbristow.SimpleSpawn.SimpleSpawn
-version: 1.1.3
+version: 2.0.0
+database: true
 author: ellbristow
 dev-url: http://dev.bukkit.org/server-mods/simplespawn
 description: >
-             Set the world's spawn location.
+             Set the world's spawn location
 commands:
   setspawn:
-    description: Set spawn location.
-    permission: simplespawn.set
+    description: Set spawn location
   spawn:
-    description: Teleport to spawn location.
-    permission: simplespawn.use
+    description: Teleport to spawn location
   sethome:
     description: Set home location.
-    permission: simplespawn.home.set
   home:
-    description: Teleport to home location.
-    permission: simplespawn.home.use
+    description: Teleport to home location
+  setjail:
+    description: Set jail location
+  jail:
+    description: Jail a player
+  jails:
+    description: Show list of Jails
+  release:
+    description: Release a player from jail
 permissions:
   simplespawn.*:
-    description: Access to all SimpleSpawn commands.
+    description: Access to all SimpleSpawn commands
     children:
       simplespawn.set: true
       simplespawn.use: true
-      simplespawn.home.set: true
-      simplespawn.home.use: true
+      simplespawn.use.worlds: true
+      simplespawn.home.*: true
+      simplespawn.jail.*: true
   simplespawn.home.*:
-    description: Access to /home and /sethome.
+    description: Access to /home and /sethome
     children:
       simplespawn.home.set: true
+      simplespawn.home.set.others: true
       simplespawn.home.use: true
+  simplespawn.jail.*:
+    description: Access to /jail and /setjail
+    children:
+      simplespawn.jail.set: true
+      simplespawn.jail.use: true
+      simplespawn.jail.release: true
+      simplespawn.jail.immune: true
+  simplespawn.use.default:
+    description: Access to /spawn for SSdefault location
   simplespawn.set:
-    description: Access to /setspawn.
+    description: Access to /setspawn
   simplespawn.use:
-    description: Access to /spawn.
+    description: Access to /spawn
+  simplespawn.use.worlds:
+    description: Access to /spawn {worldName}
   simplespawn.home.set:
-    description: Access to /sethome.
+    description: Access to /sethome
+  simplespawn.home.set.others:
+    description: Access to /sethome {playerName}
   simplespawn.home.use:
-    description: Access to /home.
+    description: Access to /home
+  simplespawn.jail.use:
+    description: Access to /jail
+  simplespawn.jail.release:
+    description: Access to /release
+  simplespawn.jail.set:
+    description: Access to /setjail
+  simplespawn.jail.list:
+    description: Access to /jails
+  simplespawn.jail.immune:
+    description: Player can't be jailed
