@@ -60,6 +60,17 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
         SSdb.getConnection();
         if (new File(getDataFolder(),"locations.yml").exists()) {
             convertDb();
+        } else {
+            if (!SSdb.checkTable("WorldSpawns")) {
+                SSdb.createTable("WorldSpawns", spawnColumns, spawnDims);
+            }
+            if (!SSdb.checkTable("PlayerHomes")) {
+                SSdb.createTable("PlayerHomes", homeColumns, homeDims);
+            }
+            if (!SSdb.checkTable("DefaultSpawn")) {
+                SSdb.createTable("DefaultSpawn", spawnColumns, spawnDims);
+                setDefaultSpawn(getServer().getWorlds().get(0).getSpawnLocation());
+            }
         }
         if (!SSdb.checkTable("Jails")) {
             SSdb.createTable("Jails", jailColumns, jailDims);
