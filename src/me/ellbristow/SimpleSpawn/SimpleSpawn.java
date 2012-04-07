@@ -41,7 +41,7 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
 
     @Override
     public void onDisable() {
-
+        SSdb.close();
     }
 
     @Override
