@@ -1,6 +1,6 @@
 package me.ellbristow.SimpleSpawn;
 
-import java.io.File;
+import java.io.*;
 import java.util.HashMap;
 import java.util.List;
 import org.bukkit.*;
@@ -58,6 +58,10 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
         saveConfig();
         SSdb = new SQLBridge(this);
         SSdb.getConnection();
+        File ebean = new File(getDataFolder().getParentFile().getParentFile(),"ebean.properties");
+        if (!ebean.exists()) {
+            createEbean(ebean);
+        }
         if (new File(getDataFolder(),"locations.yml").exists()) {
             convertDb();
         } else {
@@ -558,6 +562,18 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
         }
         usersFile.delete();
         getLogger().info("locations.yml converted to SQLite SimpleSpawn.db");
+    }
+    
+    private void createEbean(File ebean) {
+        try {
+            Writer output = new BufferedWriter(new FileWriter(ebean));
+            output.write("ebean.search.jars=bukkit.jar");
+            output.close();
+            getLogger().info("ebean.properties created!");
+        } catch (IOException e) {
+            String message = "Error Creating ebean.properties: " + e.getMessage();
+            getLogger().severe(message);
+        }
     }
 
     /* EVENT LISTENERS */
