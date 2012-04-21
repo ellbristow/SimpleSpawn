@@ -520,8 +520,8 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
     }
 
     private void convertDb() {
-        FileConfiguration usersConfig = null;
-        File usersFile = null;
+        FileConfiguration usersConfig;
+        File usersFile;
         usersFile = new File(getDataFolder(),"locations.yml");
         usersConfig = YamlConfiguration.loadConfiguration(usersFile);
         SSdb.createTable("WorldSpawns", spawnColumns, spawnDims);
@@ -566,7 +566,7 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
     public void onPlayerJoin (PlayerJoinEvent event) {
         Player player = event.getPlayer();
         if (!player.hasPlayedBefore()) {
-            player.teleport(getWorldSpawn("SSdefault"), TeleportCause.PLUGIN);
+            player.teleport(getDefaultSpawn(), TeleportCause.PLUGIN);
             return;
         }
         if (isJailed(player.getName())) {
