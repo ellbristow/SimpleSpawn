@@ -30,6 +30,7 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
     protected FileConfiguration config;
     private SQLBridge SSdb;
     public int tpEffect = 4; // 4 = off
+    private boolean setHomeWithBeds = false;
     private String[] spawnColumns = {"world", "x", "y", "z", "yaw", "pitch"};
     private String[] spawnDims = {"TEXT NOT NULL PRIMARY KEY", "DOUBLE NOT NULL DEFAULT 0", "DOUBLE NOT NULL DEFAULT 0", "DOUBLE NOT NULL DEFAULT 0", "FLOAT NOT NULL DEFAULT 0", "FLOAT NOT NULL DEFAULT 0"};
     private String[] homeColumns = {"player", "world", "x", "y", "z", "yaw", "pitch"};
@@ -55,6 +56,10 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
         } else {
             config.set("teleport_effect_type", config.getInt("teleport_effect_type", 1));
         }
+        
+        setHomeWithBeds = config.getBoolean("set_home_with_beds", true);
+        config.set("set_home_with_beds", setHomeWithBeds);
+        
         saveConfig();
         SSdb = new SQLBridge(this);
         SSdb.getConnection();
@@ -609,7 +614,10 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
                 getServer().broadcastMessage(player.getName() + ChatColor.GOLD + " has been jailed!");
             }
         } else {
-            event.setRespawnLocation(getHomeLoc(player));
+        	if(event.isBedSpawn() && !setHomeWithBeds)
+        		event.setRespawnLocation(player.getBedSpawnLocation());
+        	else
+        		event.setRespawnLocation(getHomeLoc(player));
         }
     }
 
@@ -622,6 +630,7 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
 
     @EventHandler (priority = EventPriority.NORMAL)
     public void onPlayerBedLeave (PlayerBedLeaveEvent event) {
+    	if(setHomeWithBeds)
             event.getPlayer().teleport(getHomeLoc(event.getPlayer()), TeleportCause.PLUGIN);
     }
 
@@ -629,7 +638,7 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
     public void onPlayerInteract (PlayerInteractEvent event) {
         if (!event.isCancelled()) {
             Player player = event.getPlayer();
-            if (event.getAction().equals(Action.RIGHT_CLICK_BLOCK) && event.getClickedBlock().getType().equals(Material.BED_BLOCK)) {
+            if (event.getAction().equals(Action.RIGHT_CLICK_BLOCK) && event.getClickedBlock().getType().equals(Material.BED_BLOCK) && setHomeWithBeds) {
                 setHomeLoc(player);
                 player.sendMessage(ChatColor.GOLD + "Your home has been set to this location!");
             } else {
