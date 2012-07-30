@@ -1,34 +1,54 @@
 name: SimpleSpawn
 main: me.ellbristow.SimpleSpawn.SimpleSpawn
-version: 2.0.4.1
+version: 2.0.5
 database: true
-author: ellbristow
+author: ellbristow, dh1jc
 dev-url: http://dev.bukkit.org/server-mods/simplespawn
 description: >
              Set the world's spawn location
 commands:
   setspawn:
     description: Set spawn location
+    usage: /setspawn [SSdefault]
   spawn:
     description: Teleport to spawn location
+    usage: /spawn
   sethome:
     description: Set home location.
+    usage: /sethome {player}
   home:
     description: Teleport to home location
+    usage: /home {player}
+  setwork:
+    description: Set work location.
+    usage: /setwork {player}
+  work:
+    description: Teleport to work location
+    usage: /work {player}
   setjail:
     description: Set jail location
+    usage: /setjail {jailName}    
   removejail:
     description: Remove jail if empty
+    usage: /removejail {jailName}    
   setrelease:
     description: Set release location
+    usage: /setrelease {jailName}    
   removerelease:
     description: Remove a release
+    usage: /removerelease {jailName}  
   jail:
     description: Jail a player
+    usage: /jail player {jailName}
   jails:
-    description: Show list of Jails and its inmates
+    description: Show list of Jails and number of inmates
+    usage: /jails
   release:
     description: Release a player from jail
+    usage: /release player
+  inmates:
+    description: Lists inmates of a jail
+    usage: /inmates {jailName}
 permissions:
   simplespawn.*:
     description: Access to all SimpleSpawn commands
@@ -37,6 +57,7 @@ permissions:
       simplespawn.use: true
       simplespawn.use.worlds: true
       simplespawn.home.*: true
+      simplespawn.work.*: true
       simplespawn.jail.*: true
       simplespawn.release.*: true
   simplespawn.home.*:
@@ -46,6 +67,18 @@ permissions:
       simplespawn.home.set.others: true
       simplespawn.home.use: true
       simplespawn.home.use.others: true
+  simplespawn.work.*:
+    description: Access to /work and /setwork
+    children:
+      simplespawn.work.set: true
+      simplespawn.work.set.others: true
+      simplespawn.work.use: true
+      simplespawn.work.use.others: true
+  simplespawn.release.*:
+    description: Access to /removerelease and /setrelease
+    children:
+      simplespawn.release.set: true
+      simplespawn.release.remove: true
   simplespawn.jail.*:
     description: Access to /jail and /setjail
     children:
@@ -54,6 +87,8 @@ permissions:
       simplespawn.jail.release: true
       simplespawn.jail.immune: true
       simplespawn.jail.remove: true
+      simplespawn.jail.inmates: true
+      simplespawn.jail.list: true
   simplespawn.use.default:
     description: Access to /spawn for SSdefault location
   simplespawn.set:
@@ -70,6 +105,14 @@ permissions:
     description: Access to /home
   simplespawn.home.use.others:
     description: Access to /home {playerName}
+  simplespawn.work.set:
+    description: Access to /setwork
+  simplespawn.work.set.others:
+    description: Access to /setwork {playerName}
+  simplespawn.work.use:
+    description: Access to /work
+  simplespawn.work.use.others:
+    description: Access to /work {playerName}
   simplespawn.jail.use:
     description: Access to /jail
   simplespawn.jail.release:
@@ -84,5 +127,7 @@ permissions:
     description: Access to /removerelease
   simplespawn.jail.list:
     description: Access to /jails
+  simplespawn.jail.inmates:
+    description: Access to /inmates
   simplespawn.jail.immune:
     description: Player can't be jailed
