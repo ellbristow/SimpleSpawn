@@ -79,23 +79,29 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
             convertDb();
         } else {
             if (!SSdb.checkTable("WorldSpawns")) {
+			    getLogger().info("Created table WorldSpawns in SimpleSpawn.db");
                 SSdb.createTable("WorldSpawns", spawnColumns, spawnDims);
             }
             if (!SSdb.checkTable("PlayerHomes")) {
+			    getLogger().info("Created table PlayerHomes in SimpleSpawn.db");
                 SSdb.createTable("PlayerHomes", homeColumns, homeDims);
             }
             if (!SSdb.checkTable("DefaultSpawn")) {
+				getLogger().info("Created table DefaultSpawn in SimpleSpawn.db");
                 SSdb.createTable("DefaultSpawn", spawnColumns, spawnDims);
                 setDefaultSpawn(getServer().getWorlds().get(0).getSpawnLocation());
             }
         }
         if (!SSdb.checkTable("Jails")) {
+			getLogger().info("Created table Jails in SimpleSpawn.db");
             SSdb.createTable("Jails", jailColumns, jailDims);
         }
         if (!SSdb.checkTable("Releases")) {
+			getLogger().info("Created table Releases in SimpleSpawn.db");
             SSdb.createTable("Releases", releaseColumns, releaseDims);
         }
         if (!SSdb.checkTable("Jailed")) {
+			getLogger().info("Created table Jailed in SimpleSpawn.db");
             SSdb.createTable("Jailed", jailedColumns, jailedDims);
         }
         PluginManager pm = getServer().getPluginManager();
@@ -344,9 +350,7 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
                 setJailed(target.getName(), false, args[0]);
                 getServer().broadcastMessage(target.getName() + ChatColor.GOLD + " has been released from jail!");
                 if (target.isOnline()) {
-                    // if there is a release location for this jail... teleport Player there
-                    //getRelease(jailnName);
-                    
+                    // if there is a release location for this jail... teleport Player there                    
                     Location releaseLoc = getRelease(currentJail);
                     if (releaseLoc != null) {
                         simpleTeleport(target.getPlayer(), releaseLoc);
@@ -360,6 +364,80 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
                 player.sendMessage(ChatColor.RED + "Command not recognised!");
                 player.sendMessage(ChatColor.RED + "Try: /release [playerName]");
                 return false;
+            }
+        } else if (commandLabel.equalsIgnoreCase("removejail")) {
+			if (!player.hasPermission("simplespawn.jail.remove")) {
+                player.sendMessage(ChatColor.RED + "You do not have permission to use that command!");
+                return false;
+            }
+			
+            if (args.length == 0) {
+                if (getJail("default") == null) {
+                    player.sendMessage(ChatColor.RED + "No default jail has been set!");
+                    player.sendMessage(ChatColor.RED + "Use: /setjail");
+                    return false;
+                }
+				if (getRelease("default") != null) {
+                    player.sendMessage(ChatColor.RED + "There is still a default release location set!");
+                    player.sendMessage(ChatColor.RED + "Use: /removerelease");
+                    return false;
+                }
+				
+				if (getInMates("default") == 0) {
+					removeJail("default");
+					player.sendMessage(ChatColor.GOLD + "Default jail removed!");
+					return true;
+				} else {
+					player.sendMessage(ChatColor.RED + "Default jail is not empty!");
+                    player.sendMessage(ChatColor.RED + "Use: /jails");
+                    return false;
+				}				
+			} else if (args.length == 1) {
+                if (getJail(args[1]) == null) {
+                    player.sendMessage(ChatColor.RED + "Could not find a jail called '" + ChatColor.WHITE + args[1] + ChatColor.RED + "'!");
+                    player.sendMessage(ChatColor.RED + "Use: /setjail {jailName}");
+                    return false;
+                }
+				if (getRelease(args[1]) != null) {
+                    player.sendMessage(ChatColor.RED + "There is still a release location for " + ChatColor.WHITE + args[1] + ChatColor.RED + "set!");
+                    player.sendMessage(ChatColor.RED + "Use: /removerelease {releaseName}");
+                    return false;
+                }
+
+				if (getInMates(args[1]) == 0) {
+					removeJail(args[1]);
+					player.sendMessage(ChatColor.GOLD + "Jail called " + ChatColor.WHITE + args[1] + ChatColor.GOLD + " removed!");
+					return true;
+				} else {
+					player.sendMessage(ChatColor.RED + "Jail called " + ChatColor.WHITE + args[1] + ChatColor.RED + "is not empty!");
+                    player.sendMessage(ChatColor.RED + "Use: /jails");
+                    return false;
+				}				
+            }
+		} else if (commandLabel.equalsIgnoreCase("removerelease")) {
+			if (!player.hasPermission("simplespawn.release.remove")) {
+                player.sendMessage(ChatColor.RED + "You do not have permission to use that command!");
+                return false;
+            }
+			
+            if (args.length == 0) {
+                if (getRelease("default") == null) {
+                    player.sendMessage(ChatColor.RED + "No default release has been set!");
+                    player.sendMessage(ChatColor.RED + "Use: /setrelease");
+                    return false;
+                }
+				removeRelease("default");
+				player.sendMessage(ChatColor.GOLD + "Default release removed!");
+				return true;
+			} else if (args.length == 1) {
+                if (getRelease(args[1]) == null) {
+                    player.sendMessage(ChatColor.RED + "Could not find a release called '" + ChatColor.WHITE + args[1] + ChatColor.RED + "'!");
+                    player.sendMessage(ChatColor.RED + "Use: /setrelease {releaseName}");
+                    return false;
+                }	
+				removeRelease(args[1]);
+				player.sendMessage(ChatColor.GOLD + "Release called " + ChatColor.WHITE + args[1] + ChatColor.GOLD + " removed!");
+				return true;
             }
         } else if (commandLabel.equalsIgnoreCase("jails")) {
             if (!player.hasPermission("simplespawn.jail.list")) {
@@ -569,6 +647,23 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
         return (String)jailed.get(0).get("jailName");
     }
 
+    public int getInMates(String jailName) {
+	    HashMap<Integer, HashMap<String, Object>> inMates = SSdb.select("player", "Jailed", "jailName = '" + jailName + "'", null, null);
+        if (inMates == null || inMates.isEmpty()) {
+			return 0;
+        }
+		
+		return inMates.size();
+	}
+	
+	public void removeJail(String jailName) {
+		SSdb.query("DELETE FROM Jails wherer jailName='"+ jailName + "' ");
+    }
+
+	public void removeRelease(String releaseName) {
+		SSdb.query("DELETE FROM Releases wherer releaseName='"+ releaseName + "' ");
+    }
+	
     public void setDefaultSpawn(Location location) {
         String world = location.getWorld().getName();
         double x = location.getX();
