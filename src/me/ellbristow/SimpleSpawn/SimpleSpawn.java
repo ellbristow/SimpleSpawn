@@ -142,6 +142,11 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
                 player.sendMessage(ChatColor.RED + "You do not have permission to set the spawn location!");
                 return false;
             }
+            if (isJailed(player.getName()) ) {
+            	player.sendMessage(ChatColor.RED + "You cannot set a spawn location while in jail!");
+                return false;
+            }                    
+                        
             if (args.length == 0) {
                 setWorldSpawn(player.getLocation());
                 player.sendMessage(ChatColor.GOLD + "Spawn been set to this location for this world!");
@@ -198,6 +203,11 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
                     player.sendMessage(ChatColor.RED + "You do not have permission to use that command!");
                     return false;
                 }
+                if (isJailed(player.getName()) ) {
+                	player.sendMessage(ChatColor.RED + "You cannot set a home location while in jail!");
+                    return false;
+                }                    
+
                 setHomeLoc(player);
                 player.sendMessage(ChatColor.GOLD + "Your home has been set to this location!");
                 return true;
@@ -258,6 +268,11 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
                     player.sendMessage(ChatColor.RED + "You do not have permission to use that command!");
                     return false;
                 }
+                if (isJailed(player.getName()) ) {
+                	player.sendMessage(ChatColor.RED + "You cannot set a work location while in jail!");
+                    return false;
+                }                    
+
                 setWorkLoc(player);
                 player.sendMessage(ChatColor.GOLD + "Your work has been set to this location!");
                 return true;
@@ -317,6 +332,11 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
                 player.sendMessage(ChatColor.RED + "You do not have permission to use that command!");
                 return false;
             }
+            if (isJailed(player.getName()) ) {
+            	player.sendMessage(ChatColor.RED + "You cannot set a jail location while in jail!");
+                return false;
+            }                    
+
             if (args.length == 0) {
                 setJail("default", player.getLocation());
                 player.sendMessage(ChatColor.GOLD + "Default jail set to your location!");
@@ -334,6 +354,11 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
                 player.sendMessage(ChatColor.RED + "You do not have permission to use that command!");
                 return false;
             }
+            if (isJailed(player.getName()) ) {
+            	player.sendMessage(ChatColor.RED + "You cannot set a release location while in jail!");
+                return false;
+            }                    
+
             if (args.length == 0) {
                 setRelease("default", player.getLocation());
                 player.sendMessage(ChatColor.GOLD + "Default release set to your location!");
