@@ -1,6 +1,6 @@
 name: SimpleSpawn
 main: me.ellbristow.SimpleSpawn.SimpleSpawn
-version: 2.0.4
+version: 2.0.4.1
 database: true
 author: ellbristow
 dev-url: http://dev.bukkit.org/server-mods/simplespawn
@@ -17,6 +17,8 @@ commands:
     description: Teleport to home location
   setjail:
     description: Set jail location
+  setrelease:
+    description: Set release location
   jail:
     description: Jail a player
   jails:
@@ -32,12 +34,14 @@ permissions:
       simplespawn.use.worlds: true
       simplespawn.home.*: true
       simplespawn.jail.*: true
+      simplespawn.release.*: true
   simplespawn.home.*:
     description: Access to /home and /sethome
     children:
       simplespawn.home.set: true
       simplespawn.home.set.others: true
       simplespawn.home.use: true
+      simplespawn.home.use.others: true
   simplespawn.jail.*:
     description: Access to /jail and /setjail
     children:
@@ -59,12 +63,16 @@ permissions:
     description: Access to /sethome {playerName}
   simplespawn.home.use:
     description: Access to /home
+  simplespawn.home.use.others:
+    description: Access to /home {playerName}
   simplespawn.jail.use:
     description: Access to /jail
   simplespawn.jail.release:
     description: Access to /release
   simplespawn.jail.set:
     description: Access to /setjail
+  simplespawn.release.set:
+    description: Access to /setrelease
   simplespawn.jail.list:
     description: Access to /jails
   simplespawn.jail.immune:
