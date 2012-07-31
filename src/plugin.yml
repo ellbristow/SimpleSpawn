@@ -9,10 +9,13 @@ description: >
 commands:
   setspawn:
     description: Set spawn location
-    usage: /setspawn [SSdefault]
+    usage: /setspawn [default]
   spawn:
     description: Teleport to spawn location
     usage: /spawn
+  spawndefault:
+    description: Teleport to new players spawn location
+    usage: /spawndefault
   sethome:
     description: Set home location.
     usage: /sethome {player}
@@ -54,7 +57,9 @@ permissions:
     description: Access to all SimpleSpawn commands
     children:
       simplespawn.set: true
+      simplespawn.set.default: true
       simplespawn.use: true
+      simplespawn.use.default: true
       simplespawn.use.worlds: true
       simplespawn.home.*: true
       simplespawn.work.*: true
@@ -90,9 +95,11 @@ permissions:
       simplespawn.jail.inmates: true
       simplespawn.jail.list: true
   simplespawn.use.default:
-    description: Access to /spawn for SSdefault location
+    description: Access to /spawn for new players location
   simplespawn.set:
     description: Access to /setspawn
+  simplespawn.set.default:
+    description: Access to /setspawn default
   simplespawn.use:
     description: Access to /spawn
   simplespawn.use.worlds:
