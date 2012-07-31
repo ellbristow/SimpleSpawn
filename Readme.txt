@@ -16,6 +16,14 @@
   Command	/removejail {jailName}
   Permissions simplespawn.jail.remove
   Remove an empty jail (with no releaselocation)
+
+  Command /spawnjail {jailName}
+  Permissions simplespawn.jail.spawn
+  Teleport to Jail Location
+
+  Command /spawnrelease {jailName}
+  Permissions simplespawn.release.spawn
+  Teleport to Release Location
   
   Commandenhancement
   Permissions simplespawn.home.use.other
@@ -29,7 +37,9 @@
   (also can't do sethome/setwork/home/work... while in jail)
   
   Fixed /spawn to react on current/given world.
-  added /spawndefault to spawn to "new players" spawnpoint, reusing simplespawn.use.default
+  added /spawn *default to spawn to "new players" spawnpoint, reusing simplespawn.use.default
   Added simplespawn.set.default permission 
+  
+  changed ssdefault to *default
   
 0.2.4 Initial starting point

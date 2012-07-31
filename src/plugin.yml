@@ -9,13 +9,10 @@ description: >
 commands:
   setspawn:
     description: Set spawn location
-    usage: /setspawn [default]
+    usage: /setspawn [*default]
   spawn:
     description: Teleport to spawn location
-    usage: /spawn
-  spawndefault:
-    description: Teleport to new players spawn location
-    usage: /spawndefault
+    usage: /spawn [*default]
   sethome:
     description: Set home location.
     usage: /sethome {player}
@@ -28,6 +25,9 @@ commands:
   work:
     description: Teleport to work location
     usage: /work {player}
+  spawnjail:
+    description: Teleport to jail location
+    usage: /spawnjail {jailName}
   setjail:
     description: Set jail location
     usage: /setjail {jailName}    
@@ -40,6 +40,9 @@ commands:
   removerelease:
     description: Remove a release
     usage: /removerelease {jailName}  
+  spawnrelease:
+    description: Teleport to release location
+    usage: /spawnrelease {jailName}
   jail:
     description: Jail a player
     usage: /jail player {jailName}
@@ -84,11 +87,13 @@ permissions:
     children:
       simplespawn.release.set: true
       simplespawn.release.remove: true
+      simplespawn.release.spawn: true
   simplespawn.jail.*:
     description: Access to /jail and /setjail
     children:
       simplespawn.jail.set: true
       simplespawn.jail.use: true
+      simplespawn.jail.spawn: true
       simplespawn.jail.release: true
       simplespawn.jail.immune: true
       simplespawn.jail.remove: true
@@ -136,6 +141,9 @@ permissions:
   simplespawn.jail.use:
     default: op
     description: Access to /jail
+  simplespawn.jail.spawn:
+    default: op
+    description: Access to /spawnjail
   simplespawn.jail.release:
     default: op
     description: Access to /release
@@ -148,6 +156,9 @@ permissions:
   simplespawn.release.set:
     default: op
     description: Access to /setrelease
+  simplespawn.release.spawn:
+    default: op
+    description: Access to /spawnrelease  
   simplespawn.release.remove:
     default: op
     description: Access to /removerelease

@@ -153,7 +153,7 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
                 player.sendMessage(ChatColor.GOLD + "Spawn been set to this location for this world!");
                 return true;
             } else if (args.length == 1) {
-                if (args[0].equalsIgnoreCase("ssdefault") || args[0].equalsIgnoreCase("default") ) {
+                if (args[0].equalsIgnoreCase("*default") ) {
                 	if (!player.hasPermission("simplespawn.set.default")) {
                         player.sendMessage(ChatColor.RED + "You do not have permission to set the spawn location for new players!");
                         return false;
@@ -175,18 +175,7 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
                 player.sendMessage(ChatColor.RED + "Try: /setspawn OR /setspawn default");
                 return false;
             }
-        } else if (commandLabel.equalsIgnoreCase("spawndefault")) {
-        	if (!player.hasPermission("simplespawn.use.default")) {
-                player.sendMessage(ChatColor.RED + "You do not have permission to use that command!");
-                return false;
-            }
-            if (isJailed(player.getName()) && !allowSpawnInJail) {
-            	player.sendMessage(ChatColor.RED + "You cannot spawn to default location while in jail!");
-                return false;
-            }
-            simpleTeleport(player, getDefaultSpawn());
-            return true;
-            
+     
         } else if (commandLabel.equalsIgnoreCase("spawn")) {
         	if (args.length == 0) {
             	if (!player.hasPermission("simplespawn.use")) {
@@ -200,6 +189,19 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
                 simpleTeleport(player, getWorldSpawn(player.getWorld().getName()));
                 return true;
             } else if (args.length == 1)  {
+            	if (args[1].equalsIgnoreCase("*default")) {
+                	if (!player.hasPermission("simplespawn.use.default")) {
+                        player.sendMessage(ChatColor.RED + "You do not have permission to use that command!");
+                        return false;
+                    }
+                    if (isJailed(player.getName()) && !allowSpawnInJail) {
+                    	player.sendMessage(ChatColor.RED + "You cannot spawn to default location while in jail!");
+                        return false;
+                    }
+                    simpleTeleport(player, getDefaultSpawn());
+                    return true;
+            	}
+            	
             	if (!player.hasPermission("simplespawn.use.world")) {
                     player.sendMessage(ChatColor.RED + "You do not have permission to use that command!");
                     return false;
@@ -403,7 +405,63 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
                 player.sendMessage(ChatColor.RED + "Try: /setrelease OR /setrelease {releaseName}");
                 return false;
             }        
-        
+
+        } else if (commandLabel.equalsIgnoreCase("spawnjail")) {
+        	if (!player.hasPermission("simplespawn.jail.spawn")) {
+                player.sendMessage(ChatColor.RED + "You do not have permission to use that command!");
+                return false;
+            }
+        	String jailName="default";
+        	if (args.length == 0) {
+                if (isJailed(player.getName()) && !allowSpawnInJail) {
+                	player.sendMessage(ChatColor.RED + "You cannot spawn to the default jail while in jail!");
+                    return false;
+                }
+            } else if (args.length == 1)  {
+                if (isJailed(player.getName()) && !allowSpawnInJail) {
+                	player.sendMessage(ChatColor.RED + "You cannot spawn to another jail while in jail!");
+                    return false;
+                }
+
+                jailName=args[0];
+            }
+        	
+            Location jailLocation = getJail(jailName);
+            if (jailLocation == null) {
+                player.sendMessage(ChatColor.RED + "Jail '"+ ChatColor.WHITE + args[0] + ChatColor.RED +"' not found!");
+                return false;
+            }
+            simpleTeleport(player, jailLocation);
+            return true;
+
+        } else if (commandLabel.equalsIgnoreCase("spawnrelease")) {
+        	if (!player.hasPermission("simplespawn.release.spawn")) {
+                player.sendMessage(ChatColor.RED + "You do not have permission to use that command!");
+                return false;
+            }
+        	String releaseName="default";
+        	if (args.length == 0) {
+                if (isJailed(player.getName()) && !allowSpawnInJail) {
+                	player.sendMessage(ChatColor.RED + "You cannot spawn to the default release location while in jail!");
+                    return false;
+                }
+            } else if (args.length == 1)  {
+                if (isJailed(player.getName()) && !allowSpawnInJail) {
+                	player.sendMessage(ChatColor.RED + "You cannot spawn to a release location while in jail!");
+                    return false;
+                }
+
+                releaseName=args[0];
+            }
+        	
+            Location releaseLocation = getRelease(releaseName);
+            if (releaseLocation == null) {
+                player.sendMessage(ChatColor.RED + "Release '"+ ChatColor.WHITE + args[0] + ChatColor.RED +"' not found!");
+                return false;
+            }
+            simpleTeleport(player, releaseLocation);
+            return true;
+            
         } else if (commandLabel.equalsIgnoreCase("jail")) {
             if (!player.hasPermission("simplespawn.jail.use")) {
                 player.sendMessage(ChatColor.RED + "You do not have permission to use that command!");
