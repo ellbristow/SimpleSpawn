@@ -95,46 +95,68 @@ permissions:
       simplespawn.jail.inmates: true
       simplespawn.jail.list: true
   simplespawn.use.default:
+    default: op
     description: Access to /spawn for new players location
   simplespawn.set:
+    default: op
     description: Access to /setspawn
   simplespawn.set.default:
+    default: op
     description: Access to /setspawn default
   simplespawn.use:
+    default: op
     description: Access to /spawn
   simplespawn.use.worlds:
+    default: op
     description: Access to /spawn {worldName}
   simplespawn.home.set:
+    default: true
     description: Access to /sethome
   simplespawn.home.set.others:
+    default: false
     description: Access to /sethome {playerName}
   simplespawn.home.use:
+    default: true
     description: Access to /home
   simplespawn.home.use.others:
+    default: false
     description: Access to /home {playerName}
   simplespawn.work.set:
+    default: false
     description: Access to /setwork
   simplespawn.work.set.others:
+    default: false
     description: Access to /setwork {playerName}
   simplespawn.work.use:
+    default: false
     description: Access to /work
   simplespawn.work.use.others:
+    default: false
     description: Access to /work {playerName}
   simplespawn.jail.use:
+    default: op
     description: Access to /jail
   simplespawn.jail.release:
+    default: op
     description: Access to /release
   simplespawn.jail.remove:
+    default: op
     description: Access to /removejail
   simplespawn.jail.set:
+    default: op
     description: Access to /setjail
   simplespawn.release.set:
+    default: op
     description: Access to /setrelease
   simplespawn.release.remove:
+    default: op
     description: Access to /removerelease
   simplespawn.jail.list:
+    default: op
     description: Access to /jails
   simplespawn.jail.inmates:
+    default: op
     description: Access to /inmates
   simplespawn.jail.immune:
+    default: op
     description: Player can't be jailed
