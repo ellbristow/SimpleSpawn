@@ -1067,29 +1067,23 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
             player.teleport(getDefaultSpawn(), TeleportCause.PLUGIN);
             return;
         }
+        removeImmuneFromJail(player);
+
         if (isJailed(player.getName())) {
-            if (player.hasPermission("simplespawn.jail.immune")) {
-                setJailed(player.getName(), false, null);
-                getServer().broadcastMessage(player.getName() + ChatColor.GOLD + " was pardoned from serving jail time!");
-            } else {
-                player.teleport(getJail(getWhereJailed(player.getName())) ,TeleportCause.PLUGIN);
-                getServer().broadcastMessage(player.getName() + ChatColor.GOLD + " has been jailed!");
-            }
+            player.teleport(getJail(getWhereJailed(player.getName())) ,TeleportCause.PLUGIN);
+            getServer().broadcastMessage(player.getName() + ChatColor.GOLD + " has been jailed!");
         }
     }
 
     @EventHandler (priority = EventPriority.NORMAL)
     public void onPlayerRespawn (PlayerRespawnEvent event) {
         Player player = event.getPlayer();
+        
+        removeImmuneFromJail(player);
+        
         if (isJailed(player.getName())) {
-            if (player.hasPermission("simplespawn.jail.immune")) {
-                setJailed(player.getName(), false, null);
-                getServer().broadcastMessage(player.getName() + ChatColor.GOLD + " was pardoned from serving jail time!");
-                event.setRespawnLocation(getHomeLoc(player));
-            } else {
-                event.setRespawnLocation(getJail(getWhereJailed(player.getName())));
-                getServer().broadcastMessage(player.getName() + ChatColor.GOLD + " has been jailed!");
-            }
+            event.setRespawnLocation(getJail(getWhereJailed(player.getName())));
+            getServer().broadcastMessage(player.getName() + ChatColor.GOLD + " has been jailed!");
         } else {
         	if(event.isBedSpawn() && !setHomeWithBeds)
         		event.setRespawnLocation(player.getBedSpawnLocation());
@@ -1098,6 +1092,15 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
         }
     }
 
+    public void removeImmuneFromJail(Player player) {
+        if (isJailed(player.getName())) {
+            if (player.hasPermission("simplespawn.jail.immune")) {
+                setJailed(player.getName(), false, null);
+                getServer().broadcastMessage(player.getName() + ChatColor.GOLD + " was pardoned from serving jail time!");
+            }
+        }
+    }
+    
     /*
     @EventHandler (priority = EventPriority.NORMAL)
     public void onPlayerBedEnter (PlayerBedEnterEvent event) {
@@ -1115,6 +1118,7 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
     public void onPlayerInteract (PlayerInteractEvent event) {
         if (!event.isCancelled()) {
             Player player = event.getPlayer();
+            removeImmuneFromJail(player);
 
             if (event.getAction().equals(Action.RIGHT_CLICK_BLOCK) && event.getClickedBlock().getType().equals(Material.BED_BLOCK)) {
             	if (setHomeWithBeds) {
@@ -1127,13 +1131,9 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
             	}
         	} else {
         		 if (isJailed(player.getName())) {
-        			 if (player.hasPermission("simplespawn.jail.immune")) {
-        				 setJailed(player.getName(), false, null);
-        			 } else {
-        				 event.setCancelled(true);
-        				 if (!event.getAction().equals(Action.PHYSICAL)) {
-        					 player.sendMessage(ChatColor.RED + "You cannot interact with the world while in jail!");
-        				 }
+        			 event.setCancelled(true);
+        			 if (!event.getAction().equals(Action.PHYSICAL)) {
+        				 player.sendMessage(ChatColor.RED + "You cannot interact with the world while in jail!");
         			 }
         		 }
         	}
@@ -1145,14 +1145,10 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
         if (!event.isCancelled()) {
             if (event.getCause().equals(TeleportCause.COMMAND)) {
                 Player player = event.getPlayer();
+                removeImmuneFromJail(player);
                 if (isJailed(player.getName())) {
-                    if (player.hasPermission("simplespawn.jail.immune")) {
-                        setJailed(player.getName(), false, null);
-                        getServer().broadcastMessage(player.getName() + ChatColor.GOLD + " was pardoned from serving jail time!");
-                    } else {
-                        event.setTo(getJail(getWhereJailed(player.getName())));
-                        player.sendMessage(ChatColor.RED + "You cannot teleport while you're in jail!");
-                    }
+                    event.setTo(getJail(getWhereJailed(player.getName())));
+                    player.sendMessage(ChatColor.RED + "You cannot teleport while you're in jail!");
                 }
                 Location leftLoc = event.getFrom();
                 switch (tpEffect) {
@@ -1203,13 +1199,11 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
     @EventHandler (priority = EventPriority.NORMAL)
     public void onBlockBreak (BlockBreakEvent event) {
         Player player = event.getPlayer();
+        removeImmuneFromJail(player);
+
         if (isJailed(player.getName())) {
-            if (player.hasPermission("simplespawn.jail.immune")) {
-                setJailed(player.getName(), false, null);
-            } else {
-                event.setCancelled(true);
-                player.sendMessage(ChatColor.RED + "You cannot break blocks while you're in jail!");
-            }
+            event.setCancelled(true);
+            player.sendMessage(ChatColor.RED + "You cannot break blocks while you're in jail!");
         }
     }
     
@@ -1218,12 +1212,8 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
         if (!event.isCancelled()) {
             Player player = event.getPlayer();
             if (isJailed(player.getName())) {
-                if (player.hasPermission("simplespawn.jail.immune")) {
-                    setJailed(player.getName(), false, null);
-                } else {
-                    event.setCancelled(true);
-                    player.sendMessage(ChatColor.RED + "You cannot place blocks while you're in jail!");
-                }
+                event.setCancelled(true);
+                player.sendMessage(ChatColor.RED + "You cannot place blocks while you're in jail!");
             }
         }
     }
@@ -1232,13 +1222,11 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
     public void onBlockIgnite (BlockIgniteEvent event) {
         if (!event.isCancelled() && event.getCause().equals(IgniteCause.FLINT_AND_STEEL)) {
             Player player = event.getPlayer();
+            removeImmuneFromJail(player);
+
             if (isJailed(player.getName())) {
-                if (player.hasPermission("simplespawn.jail.immune")) {
-                    setJailed(player.getName(), false, null);
-                } else {
-                    event.setCancelled(true);
-                    player.sendMessage(ChatColor.RED + "You cannot place ignite blocks while you're in jail!");
-                }
+                event.setCancelled(true);
+                player.sendMessage(ChatColor.RED + "You cannot place ignite blocks while you're in jail!");
             }
         }
     }
@@ -1247,13 +1235,11 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
     public void onPlayerEmptyBucket (PlayerBucketEmptyEvent event) {
         if (!event.isCancelled()) {
             Player player = event.getPlayer();
+            removeImmuneFromJail(player);
+
             if (isJailed(player.getName())) {
-                if (player.hasPermission("simplespawn.jail.immune")) {
-                    setJailed(player.getName(), false, null);
-                } else {
-                    event.setCancelled(true);
-                    player.sendMessage(ChatColor.RED + "You cannot empty your bucket while in jail!");
-                }
+                event.setCancelled(true);
+                player.sendMessage(ChatColor.RED + "You cannot empty your bucket while in jail!");
             }
         }
     }
@@ -1264,13 +1250,11 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
             Entity entity = event.getEntity();
             if (entity instanceof Player) {
                 Player player = (Player)entity;
+                removeImmuneFromJail(player);
+
                 if (isJailed(player.getName())) {
-                    if (player.hasPermission("simplespawn.jail.immune")) {
-                        setJailed(player.getName(), false, null);
-                    } else {
-                        event.setCancelled(true);
-                        player.sendMessage(ChatColor.RED + "You cannot fight while in jail!");
-                    }
+                    event.setCancelled(true);
+                    player.sendMessage(ChatColor.RED + "You cannot fight while in jail!");
                 }
             }
         }
