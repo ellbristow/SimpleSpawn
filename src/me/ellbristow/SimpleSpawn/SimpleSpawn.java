@@ -677,7 +677,7 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
             HashMap<Integer, HashMap<String, Object>> jailList = SSdb.select("name", "Jails",null,null,null);
             if (jailList == null || jailList.isEmpty()) {
                 player.sendMessage(ChatColor.RED + "No jails were found!");
-                return false;
+                return true;
             }
             
             String jailMessage = ChatColor.GOLD + "Jails: ";
@@ -991,7 +991,6 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
         Location location;
         if (result.isEmpty()) {
             location = getServer().getWorld(world).getSpawnLocation();
-            setWorldSpawn(location);
         } else {
             double x = (Double)result.get(0).get("x");
             double y = (Double)result.get(0).get("y");
@@ -1118,13 +1117,10 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
             Player player = event.getPlayer();
 
             if (event.getAction().equals(Action.RIGHT_CLICK_BLOCK) && event.getClickedBlock().getType().equals(Material.BED_BLOCK)) {
-            	if (isJailed(player.getName())) {
-            		event.setCancelled(true);
-                    if (!event.getAction().equals(Action.PHYSICAL)) {
-                        player.sendMessage(ChatColor.RED + "You cannot interact with the world while in jail!");
-                    }
-            	} else {
-            		if (setHomeWithBeds) {
+            	if (setHomeWithBeds) {
+            		if (isJailed(player.getName())) {
+            			player.sendMessage(ChatColor.RED + "You cannot set a home location while in jail!");
+            		} else {
             			setHomeLoc(player);
             			player.sendMessage(ChatColor.GOLD + "Your home has been set to this location!");
             		}
