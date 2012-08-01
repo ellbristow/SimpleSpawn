@@ -556,6 +556,7 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
                     // if there is a release location for this jail... teleport Player there                    
                     Location releaseLoc = getRelease(currentJail);
                     if (releaseLoc != null) {
+                    	target.getPlayer().sendMessage(ChatColor.GOLD + "You are released from jail!");
                         simpleTeleport(target.getPlayer(), releaseLoc);
                         return true;
                     } else {
