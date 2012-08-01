@@ -167,12 +167,12 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
                     return true;
                 } else {
                     player.sendMessage(ChatColor.RED + "Command not recognised!");
-                    player.sendMessage(ChatColor.RED + "Try: /setspawn OR /setspawn default");
+                    player.sendMessage(ChatColor.RED + "Try: /setspawn OR /setspawn *default");
                     return false;
                 }
             } else {
                 player.sendMessage(ChatColor.RED + "Command not recognised!");
-                player.sendMessage(ChatColor.RED + "Try: /setspawn OR /setspawn default");
+                player.sendMessage(ChatColor.RED + "Try: /setspawn OR /setspawn *default");
                 return false;
             }
      
@@ -219,7 +219,7 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
                 return true;
             } else {
                 player.sendMessage(ChatColor.RED + "Command not recognised!");
-                player.sendMessage(ChatColor.RED + "Try: /spawn {worldName}");
+                player.sendMessage(ChatColor.RED + "Try: /spawn {worldName} or /spawn *default");
                 return false;
             }
         
