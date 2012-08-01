@@ -1125,6 +1125,17 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
             			player.sendMessage(ChatColor.GOLD + "Your home has been set to this location!");
             		}
             	}
+        	} else {
+        		 if (isJailed(player.getName())) {
+        			 if (player.hasPermission("simplespawn.jail.immune")) {
+        				 setJailed(player.getName(), false, null);
+        			 } else {
+        				 event.setCancelled(true);
+        				 if (!event.getAction().equals(Action.PHYSICAL)) {
+        					 player.sendMessage(ChatColor.RED + "You cannot interact with the world while in jail!");
+        				 }
+        			 }
+        		 }
         	}
         }
     }
