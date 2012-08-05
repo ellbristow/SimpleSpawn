@@ -9,7 +9,15 @@
 # 
 # teleport_effect_type : Which effect should be played on teleport?
 # Allowed: 0 = Lightning, 1 = Ender Signal (default), 2 = Smoke, 3 = Flames
+# 
+# set_home_with_beds: Set home Location when using a bed?
+# Allowed: true|false
+# 
+# allow_spawn_in_jail: Allow build in /spawn, /home command while in jail?
+# Allowed: true|false
+# 
 
 use_teleport_effect: true
 teleport_effect_type: 1
 set_home_with_beds: false
+allow_spawn_in_jail: false
