@@ -1,5 +1,5 @@
 
-0.2.5
+2.0.5
   Commands	/setrelease {jailName} /removerelease
   Permissions simplespawn.release.set simplespawn.release.remove
   Sets spawn location for players that are released from a jail
@@ -42,4 +42,4 @@
   
   changed ssdefault to *default
   
-0.2.4 Initial starting point
+2.0.4 Initial starting point
