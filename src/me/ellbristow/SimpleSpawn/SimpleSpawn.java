@@ -375,9 +375,11 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
             if (args.length == 0) {
                 setJail("default", player.getLocation());
                 player.sendMessage(ChatColor.GOLD + "Default jail set to your location!");
+                return true;
             } else if (args.length == 1) {
                 setJail(args[0], player.getLocation());
                 player.sendMessage(ChatColor.GOLD + "Jail '" + ChatColor.WHITE + args[0] + ChatColor.GOLD + "' set to your location!");
+                return true;
             } else {
                 player.sendMessage(ChatColor.RED + "Command not recognised!");
                 player.sendMessage(ChatColor.RED + "Try: /setjail OR /setjail {jailName}");
@@ -397,9 +399,11 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
             if (args.length == 0) {
                 setRelease("default", player.getLocation());
                 player.sendMessage(ChatColor.GOLD + "Default release set to your location!");
+                return true;
             } else if (args.length == 1) {
                 setRelease(args[0], player.getLocation());
                 player.sendMessage(ChatColor.GOLD + "Release '" + ChatColor.WHITE + args[0] + ChatColor.GOLD + "' set to your location!");
+                return true;
             } else {
                 player.sendMessage(ChatColor.RED + "Command not recognised!");
                 player.sendMessage(ChatColor.RED + "Try: /setrelease OR /setrelease {releaseName}");
@@ -522,11 +526,12 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
                         return true;
                     } else {
                         player.sendMessage(targetPlayer.getName() + ChatColor.RED + " cannot be jailed!");
-                        return false;
+                        return true;
                     }
                 } else {
                     setJailed(target.getName(), true, "default");
                     getServer().broadcastMessage(target.getName() + ChatColor.GOLD + " has been sentenced to jail!");
+                    return true;
                 }
             } else {
                 player.sendMessage(ChatColor.RED + "Command not recognised!");
@@ -562,7 +567,6 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
                     } else {
                     	target.getPlayer().sendMessage(ChatColor.GOLD + "You may now leave the jail!");
                     }
-                    
                 }
             } else {
                 player.sendMessage(ChatColor.RED + "Command not recognised!");
