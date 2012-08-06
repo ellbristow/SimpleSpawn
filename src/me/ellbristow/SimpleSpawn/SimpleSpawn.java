@@ -288,7 +288,11 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
                     player.sendMessage(ChatColor.RED + "Player '" + ChatColor.WHITE + args[0] + ChatColor.RED + "' not found!");
                     return false;
                 }
-                Location homeLoc = getHomeLoc(target.getPlayer());
+            	if (!target.isOnline() && !player.hasPermission("simplespawn.home.use.offline")) {
+                    player.sendMessage(ChatColor.RED + "You do not have permission to use that command to spawn to offline players home!");
+                    return false;            	
+            	}
+                Location homeLoc = getHomeLoc(target.getName());
                 simpleTeleport(player, homeLoc);
                 return true;           	 
              }
@@ -326,7 +330,7 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
                 return true;
             } else {
                 player.sendMessage(ChatColor.RED + "Command not recognised!");
-                player.sendMessage(ChatColor.RED + "Try: /setwork OR /setwork{playerName}");
+                player.sendMessage(ChatColor.RED + "Try: /setwork OR /setwork {playerName}");
                 return false;
             }
         
@@ -341,6 +345,12 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
                     return false;
                 }                    
                 Location workLoc = getWorkLoc(player);
+                if (workLoc == null) {
+                	player.sendMessage(ChatColor.RED + "You haven't set your work!");
+                    player.sendMessage(ChatColor.RED + "Try: /setwork OR /setwork {playerName}");
+                    return false;
+                }                    
+                
                 simpleTeleport(player, workLoc);
                 return true;
              } else if (args.length == 1) {
@@ -351,13 +361,22 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
                 if (isJailed(player.getName()) && !allowSpawnInJail) {
                 	player.sendMessage(ChatColor.RED + "You cannot go to others work while in jail!");
                     return false;
-                }                    
+                }
             	OfflinePlayer target = getServer().getOfflinePlayer(args[0]);
                 if (!target.hasPlayedBefore()) {
                     player.sendMessage(ChatColor.RED + "Player '" + ChatColor.WHITE + args[0] + ChatColor.RED + "' not found!");
                     return false;
                 }
-                Location workLoc = getWorkLoc(target.getPlayer());
+            	if (!target.isOnline() && !player.hasPermission("simplespawn.work.use.offline")) {
+                    player.sendMessage(ChatColor.RED + "You do not have permission to use that command to spawn to offline players work!");
+                    return false;            	
+            	}
+                Location workLoc = getWorkLoc(target.getName());
+                if (workLoc == null) {
+                	player.sendMessage(ChatColor.RED + "Player '" + ChatColor.WHITE + args[0] + ChatColor.RED + "' haven't set a work location!");
+                    player.sendMessage(ChatColor.RED + "Try: /setwork OR /setwork {playerName}");
+                    return false;
+                }
                 simpleTeleport(player, workLoc);
                 return true;           	 
              }	
@@ -768,11 +787,11 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
             float yaw = homeLoc.getYaw();
             float pitch = homeLoc.getPitch();
             SSdb.query("INSERT OR REPLACE INTO PlayerHomes (player, world, x, y, z, yaw, pitch) VALUES ('" + target.getName() + "', '" + world + "', " + x + ", " + y + ", " + z + ", " + yaw + ", " + pitch + ")");
-            player.setBedSpawnLocation(homeLoc);
+            target.getPlayer().setBedSpawnLocation(homeLoc);
     }
 
-    public Location getHomeLoc(Player player) {
-        HashMap<Integer, HashMap<String, Object>> result = SSdb.select("world, x, y, z, yaw, pitch", "PlayerHomes", "player = '" + player.getName() + "'", null, null);
+    public Location getHomeLoc(String playerName) {
+        HashMap<Integer, HashMap<String, Object>> result = SSdb.select("world, x, y, z, yaw, pitch", "PlayerHomes", "player = '" + playerName + "'", null, null);
         Location location;
         if (result.isEmpty()) {
             location = getServer().getWorlds().get(0).getSpawnLocation();
@@ -787,6 +806,10 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
         }
         return location;
     }
+    
+    public Location getHomeLoc(Player player) {
+    	return getHomeLoc(player.getName());
+    }
 
     public void setWorkLoc(Player player) {
         Location homeLoc = player.getLocation();
@@ -797,7 +820,6 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
         float yaw = homeLoc.getYaw();
         float pitch = homeLoc.getPitch();
         SSdb.query("INSERT OR REPLACE INTO PlayerWorks (player, world, x, y, z, yaw, pitch) VALUES ('" + player.getName() + "', '" + world + "', " + x + ", " + y + ", " + z + ", " + yaw + ", " + pitch + ")");
-        player.setBedSpawnLocation(homeLoc);
 	}
 	
 	public void setOtherWorkLoc(OfflinePlayer target, Player player) {
@@ -809,14 +831,17 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
 	        float yaw = homeLoc.getYaw();
 	        float pitch = homeLoc.getPitch();
 	        SSdb.query("INSERT OR REPLACE INTO PlayerWorks (player, world, x, y, z, yaw, pitch) VALUES ('" + target.getName() + "', '" + world + "', " + x + ", " + y + ", " + z + ", " + yaw + ", " + pitch + ")");
-	        player.setBedSpawnLocation(homeLoc);
 	}
-	
+
 	public Location getWorkLoc(Player player) {
-	    HashMap<Integer, HashMap<String, Object>> result = SSdb.select("world, x, y, z, yaw, pitch", "PlayerWorks", "player = '" + player.getName() + "'", null, null);
+		return getWorkLoc(player.getName());
+	}
+
+	public Location getWorkLoc(String playerName) {
+	    HashMap<Integer, HashMap<String, Object>> result = SSdb.select("world, x, y, z, yaw, pitch", "PlayerWorks", "player = '" + playerName + "'", null, null);
 	    Location location;
 	    if (result.isEmpty()) {
-	        location = getServer().getWorlds().get(0).getSpawnLocation();
+	    	return null;
 	    } else {
 	        String world = (String)result.get(0).get("world");
 	        double x = (Double)result.get(0).get("x");

@@ -1,6 +1,6 @@
 name: SimpleSpawn
 main: me.ellbristow.SimpleSpawn.SimpleSpawn
-version: 2.0.5
+version: 2.0.6
 database: true
 author: ellbristow, dh1jc
 dev-url: http://dev.bukkit.org/server-mods/simplespawn
@@ -75,6 +75,7 @@ permissions:
       simplespawn.home.set.others: true
       simplespawn.home.use: true
       simplespawn.home.use.others: true
+      simplespawn.home.use.offline: true
   simplespawn.work.*:
     description: Access to /work and /setwork
     children:
@@ -82,6 +83,7 @@ permissions:
       simplespawn.work.set.others: true
       simplespawn.work.use: true
       simplespawn.work.use.others: true
+      simplespawn.work.use.offline: true
   simplespawn.release.*:
     description: Access to /removerelease and /setrelease
     children:
@@ -126,6 +128,9 @@ permissions:
   simplespawn.home.use.others:
     default: false
     description: Access to /home {playerName}
+  simplespawn.home.use.offline:
+    default: false
+    description: Access to /home {playerName}
   simplespawn.work.set:
     default: false
     description: Access to /setwork
@@ -136,6 +141,9 @@ permissions:
     default: false
     description: Access to /work
   simplespawn.work.use.others:
+    default: false
+    description: Access to /work {playerName}
+  simplespawn.work.use.offline:
     default: false
     description: Access to /work {playerName}
   simplespawn.jail.use:
