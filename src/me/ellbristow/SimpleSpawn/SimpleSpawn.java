@@ -276,7 +276,7 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
                 return true;
              } else if (args.length == 1) {
             	if (!player.hasPermission("simplespawn.home.use.others")) {
-                     player.sendMessage(ChatColor.RED + "You do not have permission to use that command to spawn to others home!");
+                    player.sendMessage(ChatColor.RED + "You do not have permission to use that command to spawn to others home!");
                     return false;
                 }
                 if (isJailed(player.getName()) && !allowSpawnInJail) {
@@ -293,6 +293,10 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
                     return false;            	
             	}
                 Location homeLoc = getHomeLoc(target.getName());
+                if (homeLoc == null) {
+                	player.sendMessage(ChatColor.RED + "Can't find " + ChatColor.WHITE + args[0] + ChatColor.RED + "'s home or bed!");
+                	return false;
+                }
                 simpleTeleport(player, homeLoc);
                 return true;           	 
              }
@@ -446,7 +450,7 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
             	}
                 Location workLoc = getWorkLoc(target.getName());
                 if (workLoc == null) {
-                	player.sendMessage(ChatColor.RED + "Player '" + ChatColor.WHITE + args[0] + ChatColor.RED + "' haven't set a work location!");
+                	player.sendMessage(ChatColor.RED + "Player '" + ChatColor.WHITE + args[0] + ChatColor.RED + "' hasn't set a work location!");
                     player.sendMessage(ChatColor.RED + "Try: /setwork OR /setwork {playerName}");
                     return false;
                 }
@@ -871,7 +875,8 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
         HashMap<Integer, HashMap<String, Object>> result = SSdb.select("world, x, y, z, yaw, pitch", "PlayerHomes", "player = '" + playerName + "'", null, null);
         Location location;
         if (result.isEmpty()) {
-            location = getServer().getWorlds().get(0).getSpawnLocation();
+        	// if you haven't used /sethome first home is your bed
+        	location = getServer().getOfflinePlayer(playerName).getBedSpawnLocation();
         } else {
             String world = (String)result.get(0).get("world");
             double x = (Double)result.get(0).get("x");
@@ -885,7 +890,14 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
     }
     
     public Location getHomeLoc(Player player) {
-    	return getHomeLoc(player.getName());
+    	Location homeLoc = getHomeLoc(player.getName());
+
+    	// Default Spawn Location in this world if no Home/Bed set
+    	if (homeLoc == null) {
+    		homeLoc = getWorldSpawn(player.getWorld().getName());
+    	}
+    	
+    	return homeLoc;
     }
 
     public void setWorkLoc(Player player) {
