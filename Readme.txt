@@ -1,6 +1,12 @@
+2.0.7
+  BugFix: teleporting home after using bed in Jails - fixed
+  Added /removehome {other} /removework {other}
+  Permission: simplespawn.home.remove, simplespawn.home.remove.other
+  	simplespawn.work.remove, simplespawn.work.remove.other
+  
 2.0.6
   Bugfix /home /work with offinusers
-  ne pemission simplespawn.home.use.offine, simplespawn.work.use.offine
+  new pemission simplespawn.home.use.offine, simplespawn.work.use.offine
 
 2.0.5
   Commands	/setrelease {jailName} /removerelease

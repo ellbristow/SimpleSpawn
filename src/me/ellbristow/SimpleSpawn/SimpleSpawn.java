@@ -222,7 +222,7 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
                 player.sendMessage(ChatColor.RED + "Try: /spawn {worldName} or /spawn *default");
                 return false;
             }
-        
+        	
         } else if (commandLabel.equalsIgnoreCase("sethome")) {
             if (args.length == 0) {
                 if (!player.hasPermission("simplespawn.home.set")) {
@@ -296,7 +296,43 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
                 simpleTeleport(player, homeLoc);
                 return true;           	 
              }
+        } else if (commandLabel.equalsIgnoreCase("removehome")) {
+            if (args.length == 0) {
+                if (!player.hasPermission("simplespawn.home.remove")) {
+                    player.sendMessage(ChatColor.RED + "You do not have permission to use that command!");
+                    return false;
+                }
+                if (isJailed(player.getName()) ) {
+                	player.sendMessage(ChatColor.RED + "You cannot remove a home location while in jail!");
+                    return false;
+                }                    
 
+                removeHome(player.getName());
+                player.sendMessage(ChatColor.GOLD + "Your home location has been removed!");
+                return true;
+            } else if (args.length == 1) {
+                if (!player.hasPermission("simplespawn.home.remove.others")) {
+                    player.sendMessage(ChatColor.RED + "You do not have permission to remove other peoples work!");
+                    return false;
+                }
+                if (isJailed(player.getName()) ) {
+                	player.sendMessage(ChatColor.RED + "You cannot remove a home location for others while in jail!");
+                    return false;
+                }                    
+                OfflinePlayer target = getServer().getOfflinePlayer(args[0]);
+                if (!target.hasPlayedBefore()) {
+                    player.sendMessage(ChatColor.RED + "Player '" + ChatColor.WHITE + args[0] + ChatColor.RED + "' not found!");
+                    return false;
+                }
+                removeHome(target.getName());
+                player.sendMessage(target.getName() + ChatColor.GOLD + "'s home location has been removed!");
+                return true;
+            } else {
+                player.sendMessage(ChatColor.RED + "Command not recognised!");
+                player.sendMessage(ChatColor.RED + "Try: /removehome OR /removehome {playerName}");
+                return false;
+            }
+        	
         } else if (commandLabel.equalsIgnoreCase("setwork")) {
             if (args.length == 0) {
                 if (!player.hasPermission("simplespawn.work.set")) {
@@ -333,7 +369,44 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
                 player.sendMessage(ChatColor.RED + "Try: /setwork OR /setwork {playerName}");
                 return false;
             }
-        
+
+        } else if (commandLabel.equalsIgnoreCase("removework")) {
+            if (args.length == 0) {
+                if (!player.hasPermission("simplespawn.work.remove")) {
+                    player.sendMessage(ChatColor.RED + "You do not have permission to use that command!");
+                    return false;
+                }
+                if (isJailed(player.getName()) ) {
+                	player.sendMessage(ChatColor.RED + "You cannot remove a work location while in jail!");
+                    return false;
+                }                    
+
+                removeWork(player.getName());
+                player.sendMessage(ChatColor.GOLD + "Your work location has been removed!");
+                return true;
+            } else if (args.length == 1) {
+                if (!player.hasPermission("simplespawn.work.remove.others")) {
+                    player.sendMessage(ChatColor.RED + "You do not have permission to remove other peoples work!");
+                    return false;
+                }
+                if (isJailed(player.getName()) ) {
+                	player.sendMessage(ChatColor.RED + "You cannot remove a work location for others while in jail!");
+                    return false;
+                }                    
+                OfflinePlayer target = getServer().getOfflinePlayer(args[0]);
+                if (!target.hasPlayedBefore()) {
+                    player.sendMessage(ChatColor.RED + "Player '" + ChatColor.WHITE + args[0] + ChatColor.RED + "' not found!");
+                    return false;
+                }
+                removeWork(target.getName());
+                player.sendMessage(target.getName() + ChatColor.GOLD + "'s work location has been removed!");
+                return true;
+            } else {
+                player.sendMessage(ChatColor.RED + "Command not recognised!");
+                player.sendMessage(ChatColor.RED + "Try: /removework OR /removework {playerName}");
+                return false;
+            }
+            
         } else if (commandLabel.equalsIgnoreCase("work")) {
         	if (args.length == 0) {
         		if (!player.hasPermission("simplespawn.work.use")) {
@@ -766,6 +839,12 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
         player.sendMessage(ChatColor.GOLD + "WHOOSH!");
     }
 
+    public void setBedLoc(Player player) {
+    	Location homeLoc = player.getLocation();
+        setHomeLoc(player);
+        player.setBedSpawnLocation(homeLoc);
+    }
+    
     public void setHomeLoc(Player player) {
             Location homeLoc = player.getLocation();
             String world = homeLoc.getWorld().getName();
@@ -775,7 +854,6 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
             float yaw = homeLoc.getYaw();
             float pitch = homeLoc.getPitch();
             SSdb.query("INSERT OR REPLACE INTO PlayerHomes (player, world, x, y, z, yaw, pitch) VALUES ('" + player.getName() + "', '" + world + "', " + x + ", " + y + ", " + z + ", " + yaw + ", " + pitch + ")");
-            player.setBedSpawnLocation(homeLoc);
     }
 
     public void setOtherHomeLoc(OfflinePlayer target, Player player) {
@@ -787,7 +865,6 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
             float yaw = homeLoc.getYaw();
             float pitch = homeLoc.getPitch();
             SSdb.query("INSERT OR REPLACE INTO PlayerHomes (player, world, x, y, z, yaw, pitch) VALUES ('" + target.getName() + "', '" + world + "', " + x + ", " + y + ", " + z + ", " + yaw + ", " + pitch + ")");
-            target.getPlayer().setBedSpawnLocation(homeLoc);
     }
 
     public Location getHomeLoc(String playerName) {
@@ -965,8 +1042,15 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
 		return matesList;
 	}
 
-    
-	public void removeJail(String jailName) {
+	public void removeHome(String playerName) {
+		SSdb.query("DELETE FROM PlayerHomes wherer player='"+ playerName + "' ");
+    }
+	
+	public void removeWork(String playerName) {
+		SSdb.query("DELETE FROM PlayerHomes wherer player='"+ playerName + "' ");
+    }
+	
+    public void removeJail(String jailName) {
 		SSdb.query("DELETE FROM Jails wherer jailName='"+ jailName + "' ");
     }
 
@@ -1130,19 +1214,18 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
         }
     }
     
-    /*
-    @EventHandler (priority = EventPriority.NORMAL)
-    public void onPlayerBedEnter (PlayerBedEnterEvent event) {
-            setHomeLoc(event.getPlayer());
-    }
-    */
-
+    // Maybe not needed at all... as setting home is done in interact with world/
     @EventHandler (priority = EventPriority.NORMAL)
     public void onPlayerBedLeave (PlayerBedLeaveEvent event) {
-    	if(setHomeWithBeds)
-            event.getPlayer().teleport(getHomeLoc(event.getPlayer()), TeleportCause.PLUGIN);
+    	if(setHomeWithBeds) {
+    		if (isJailed(event.getPlayer().getName())) {
+    			event.getPlayer().teleport(event.getBed().getLocation(), TeleportCause.PLUGIN);        		
+    	    } else {
+    	    	event.getPlayer().teleport(getHomeLoc(event.getPlayer()), TeleportCause.PLUGIN);		
+    		}
+    	}
     }
-
+    
     @EventHandler (priority = EventPriority.NORMAL)
     public void onPlayerInteract (PlayerInteractEvent event) {
         if (!event.isCancelled()) {
