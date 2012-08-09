@@ -1,3 +1,6 @@
+2.0.6
+  Bugfix /home /work with offinusers
+  ne pemission simplespawn.home.use.offine, simplespawn.work.use.offine
 
 2.0.5
   Commands	/setrelease {jailName} /removerelease
