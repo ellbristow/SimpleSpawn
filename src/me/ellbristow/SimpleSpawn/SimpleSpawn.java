@@ -28,7 +28,6 @@ import org.bukkit.event.block.BlockIgniteEvent;
 import org.bukkit.event.block.BlockIgniteEvent.IgniteCause;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.player.PlayerBedLeaveEvent;
 import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -662,6 +661,7 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
                         return true;
                     } else {
                     	target.getPlayer().sendMessage(ChatColor.GOLD + "You may now leave the jail!");
+                        return true;
                     }
                 }
             } else {
@@ -1227,16 +1227,16 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
     }
     
     // Maybe not needed at all... as setting home is done in interact with world/
-    @EventHandler (priority = EventPriority.NORMAL)
-    public void onPlayerBedLeave (PlayerBedLeaveEvent event) {
-    	if(setHomeWithBeds) {
-    		if (isJailed(event.getPlayer().getName())) {
-    			event.getPlayer().teleport(event.getBed().getLocation(), TeleportCause.PLUGIN);        		
-    	    } else {
-    	    	event.getPlayer().teleport(getHomeLoc(event.getPlayer()), TeleportCause.PLUGIN);		
-    		}
-    	}
-    }
+//    @EventHandler (priority = EventPriority.NORMAL)
+//    public void onPlayerBedLeave (PlayerBedLeaveEvent event) {
+//    	if(setHomeWithBeds) {
+//    		if (isJailed(event.getPlayer().getName())) {
+//    			event.getPlayer().teleport(event.getBed().getLocation(), TeleportCause.PLUGIN);        		
+//    	    } else {
+//    	    	event.getPlayer().teleport(getHomeLoc(event.getPlayer()), TeleportCause.PLUGIN);		
+//    		}
+//    	}
+//    }
     
     @EventHandler (priority = EventPriority.NORMAL)
     public void onPlayerInteract (PlayerInteractEvent event) {
