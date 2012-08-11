@@ -1,5 +1,6 @@
 2.0.7
   BugFix: teleporting home after using bed in Jails - fixed
+  BugFix: sql delete statements corrected
   Added /removehome {other} /removework {other}
   Permission: simplespawn.home.remove, simplespawn.home.remove.other
   	simplespawn.work.remove, simplespawn.work.remove.other

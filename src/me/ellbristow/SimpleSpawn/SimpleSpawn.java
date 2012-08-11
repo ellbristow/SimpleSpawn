@@ -44,7 +44,7 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
     public static SimpleSpawn plugin;
     protected FileConfiguration config;
     private SQLBridge SSdb;
-    public int tpEffect = 4; // 4 = off
+    public int tpEffect = -1; // -1 = off
     private boolean setHomeWithBeds = false;
     private boolean allowSpawnInJail = false;
     
@@ -159,11 +159,11 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
                         return false;
                     }
                     if (isJailed(player.getName()) ) {
-                    	player.sendMessage(ChatColor.RED + "You cannot set a spawn location while in jail!");
+                    	player.sendMessage(ChatColor.RED + "You cannot set a default spawn location while in jail!");
                         return false;
                     }                    
                     setDefaultSpawn(player.getLocation());
-                    player.sendMessage(ChatColor.GOLD + "Spawn been set to this location for new players!");
+                    player.sendMessage(ChatColor.GOLD + "Spawn for new players been set to this location for new players!");
                     return true;
                 } else {
                     player.sendMessage(ChatColor.RED + "Command not recognised!");
@@ -250,10 +250,10 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
                 OfflinePlayer target = getServer().getOfflinePlayer(args[0]);
                 if (!target.hasPlayedBefore()) {
                     player.sendMessage(ChatColor.RED + "Player '" + ChatColor.WHITE + args[0] + ChatColor.RED + "' not found!");
-                    return false;
+                    return true;
                 }
                 setOtherHomeLoc(target, player);
-                player.sendMessage(target.getName() + ChatColor.GOLD + "'s home has been set to this location!");
+                player.sendMessage(ChatColor.WHITE + target.getName() + ChatColor.GOLD + "'s home has been set to this location!");
                 return true;
             } else {
                 player.sendMessage(ChatColor.RED + "Command not recognised!");
@@ -329,7 +329,7 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
                     return false;
                 }
                 removeHome(target.getName());
-                player.sendMessage(target.getName() + ChatColor.GOLD + "'s home location has been removed!");
+                player.sendMessage(ChatColor.WHITE + target.getName() + ChatColor.GOLD + "'s home location has been removed!");
                 return true;
             } else {
                 player.sendMessage(ChatColor.RED + "Command not recognised!");
@@ -366,7 +366,7 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
                     return false;
                 }
                 setOtherWorkLoc(target, player);
-                player.sendMessage(target.getName() + ChatColor.GOLD + "'s work has been set to this location!");
+                player.sendMessage(ChatColor.WHITE + target.getName() + ChatColor.GOLD + "'s work has been set to this location!");
                 return true;
             } else {
                 player.sendMessage(ChatColor.RED + "Command not recognised!");
@@ -403,7 +403,7 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
                     return false;
                 }
                 removeWork(target.getName());
-                player.sendMessage(target.getName() + ChatColor.GOLD + "'s work location has been removed!");
+                player.sendMessage(ChatColor.WHITE + target.getName() + ChatColor.GOLD + "'s work location has been removed!");
                 return true;
             } else {
                 player.sendMessage(ChatColor.RED + "Command not recognised!");
@@ -1055,19 +1055,19 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
 	}
 
 	public void removeHome(String playerName) {
-		SSdb.query("DELETE FROM PlayerHomes wherer player='"+ playerName + "' ");
+		SSdb.query("DELETE FROM PlayerHomes WHERE player='"+ playerName + "' ");
     }
 	
 	public void removeWork(String playerName) {
-		SSdb.query("DELETE FROM PlayerHomes wherer player='"+ playerName + "' ");
+		SSdb.query("DELETE FROM PlayerWorks WHERE player='"+ playerName + "' ");
     }
 	
     public void removeJail(String jailName) {
-		SSdb.query("DELETE FROM Jails wherer jailName='"+ jailName + "' ");
+		SSdb.query("DELETE FROM Jails WHERE name='"+ jailName + "' ");
     }
 
 	public void removeRelease(String releaseName) {
-		SSdb.query("DELETE FROM Releases wherer releaseName='"+ releaseName + "' ");
+		SSdb.query("DELETE FROM Releases WHERE name='"+ releaseName + "' ");
     }
 	
 	// ONLY FOR NEW PLAYERS
