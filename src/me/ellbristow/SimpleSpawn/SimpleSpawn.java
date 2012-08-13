@@ -650,11 +650,12 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
                     return false;
                 }
                 String currentJail = getWhereJailed(target.getName());
-                setJailed(target.getName(), false, args[0]);
-                getServer().broadcastMessage(target.getName() + ChatColor.GOLD + " has been released from jail!");
+            	setJailed(target.getName(), false, args[0]);
+                getServer().broadcastMessage(ChatColor.WHITE + target.getName() + ChatColor.GOLD + " has been released from jail!");
+                Location releaseLoc = getRelease(currentJail);
+
                 if (target.isOnline()) {
                     // if there is a release location for this jail... teleport Player there                    
-                    Location releaseLoc = getRelease(currentJail);
                     if (releaseLoc != null) {
                     	target.getPlayer().sendMessage(ChatColor.GOLD + "You are released from jail!");
                         simpleTeleport(target.getPlayer(), releaseLoc);
@@ -662,6 +663,11 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
                     } else {
                     	target.getPlayer().sendMessage(ChatColor.GOLD + "You may now leave the jail!");
                         return true;
+                    }
+                } else {
+                    if (releaseLoc != null) {
+                    	player.sendMessage(ChatColor.WHITE + target.getName() + ChatColor.GOLD + " has been released from jail, but not send to releasePoint. [Player is offline]");
+                    	return true;
                     }
                 }
             } else {
@@ -1210,9 +1216,9 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
             event.setRespawnLocation(getJail(getWhereJailed(player.getName())));
             getServer().broadcastMessage(player.getName() + ChatColor.GOLD + " has been jailed!");
         } else {
-        	if(event.isBedSpawn() && !setHomeWithBeds)
+        	if(event.isBedSpawn() && !setHomeWithBeds) 
         		event.setRespawnLocation(player.getBedSpawnLocation());
-        	else
+        	else 
         		event.setRespawnLocation(getHomeLoc(player));
         }
     }
@@ -1226,18 +1232,6 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
         }
     }
     
-    // Maybe not needed at all... as setting home is done in interact with world/
-//    @EventHandler (priority = EventPriority.NORMAL)
-//    public void onPlayerBedLeave (PlayerBedLeaveEvent event) {
-//    	if(setHomeWithBeds) {
-//    		if (isJailed(event.getPlayer().getName())) {
-//    			event.getPlayer().teleport(event.getBed().getLocation(), TeleportCause.PLUGIN);        		
-//    	    } else {
-//    	    	event.getPlayer().teleport(getHomeLoc(event.getPlayer()), TeleportCause.PLUGIN);		
-//    		}
-//    	}
-//    }
-    
     @EventHandler (priority = EventPriority.NORMAL)
     public void onPlayerInteract (PlayerInteractEvent event) {
         if (!event.isCancelled()) {
@@ -1249,7 +1243,7 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
             		if (isJailed(player.getName())) {
             			player.sendMessage(ChatColor.RED + "You cannot set a home location while in jail!");
             		} else {
-            			setHomeLoc(player);
+            			setBedLoc(player);
             			player.sendMessage(ChatColor.GOLD + "Your home has been set to this location!");
             		}
             	}
