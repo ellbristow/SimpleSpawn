@@ -25,7 +25,7 @@ public class SQLBridge {
         return conn;
     }
     
-    public Connection open() {
+    public Connection open() {    	
         try {
             conn = DriverManager.getConnection("jdbc:sqlite:" + sqlFile.getAbsolutePath());
             return conn;
@@ -48,12 +48,16 @@ public class SQLBridge {
     public boolean checkTable(String tableName) {
         DatabaseMetaData dbm = null;
         try {
-            dbm = this.open().getMetaData();
+            dbm = getConnection().getMetaData();
             ResultSet tables = dbm.getTables(null, null, tableName, null);
-            if (tables.next())
+            if (tables.next()) {
+            	tables.close();
                 return true;
-            else
+            }
+            else {
+            	tables.close();
                 return false;
+            }
         } catch (Exception e) {
             plugin.getLogger().severe(e.getMessage());
             return false;
@@ -62,7 +66,7 @@ public class SQLBridge {
     
     public boolean createTable(String tableName, String[] columns, String[] dims) {
         try {
-            statement = conn.createStatement();
+            statement = getConnection().createStatement();
             String query = "CREATE TABLE " + tableName + "(";
             for (int i = 0; i < columns.length; i++) {
                 if (i!=0) {
@@ -74,14 +78,14 @@ public class SQLBridge {
             statement.execute(query);
         } catch (Exception e) {
             plugin.getLogger().severe(e.getMessage());
-        }
+        } 
         return true;
     }
-    
-    public ResultSet query(String query) {
+
+    public ResultSet query(String query) {        
         ResultSet results = null;
         try {
-            statement = conn.createStatement();
+            statement = getConnection().createStatement();
             results = statement.executeQuery(query);
             return results;
         } catch (Exception e) {
@@ -90,12 +94,14 @@ public class SQLBridge {
             }
             try {
                 results.close();
+                statement.close();
             } catch (Exception ex) {
             }
         }
         if (results != null) {
             try {
                 results.close();
+                statement.close();
             } catch (Exception ex) {
             }
         }
@@ -107,21 +113,22 @@ public class SQLBridge {
             fields = "*";
         }
         String query = "SELECT " + fields + " FROM " + tableName;
+        if (!"".equals(where) && where != null) {
+            query += " WHERE " + where;
+        }
+        if (!"".equals(group) && group != null) {
+            query += " GROUP BY " + group;
+        }
+        if (!"".equals(order) && order != null) {
+            query += " ORDER BY " + order;
+        }
+
         ResultSet results = null;
         try {
-            statement = conn.createStatement();
-            if (!"".equals(where) && where != null) {
-                query += " WHERE " + where;
-            }
-            if (!"".equals(group) && group != null) {
-                query += " GROUP BY " + group;
-            }
-            if (!"".equals(order) && order != null) {
-                query += " ORDER BY " + order;
-            }
             rows.clear();
             numRows = 0;
-            results = statement.executeQuery(query);
+            results = query(query);
+                        
             if (results != null) {
                 int columns = results.getMetaData().getColumnCount();
                 String columnNames = "";
@@ -142,20 +149,21 @@ public class SQLBridge {
                     numRows++;
                 }
                 results.close();
+                statement.close();
                 return rows;
             } else {
                 return null;
             }
-        } catch (Exception e) {
+        } catch (Exception e) { 
             plugin.getLogger().severe(e.getMessage());
             if (results != null) {
                 try {
                     results.close();
+                    statement.close();
                 } catch (Exception ex) {
                 }
             }
         }
         return null;
     }
-    
 }

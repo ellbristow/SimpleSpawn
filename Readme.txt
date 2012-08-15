@@ -1,3 +1,11 @@
+
+2.0.9
+  BugFix: Problem with sqlite on Win7, 64bit [database locked]
+  
+2.0.8
+  BugFix: reported problem on respawn and destoryed beds - fixed
+  Added message when releasing OfflinePlayers from Jail as they are not been send to release point.
+
 2.0.7
   BugFix: teleporting home after using bed in Jails - fixed
   BugFix: sql delete statements corrected
