@@ -1,3 +1,6 @@
+2.0.10
+  BugFix: Null Pointer exceptions on respawn in logfile
+  Check for ImmunePlayer in Jail only during Join/Respawn
 
 2.0.9
   BugFix: Problem with sqlite on Win7, 64bit [database locked]
