@@ -81,7 +81,7 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
         setHomeWithBeds = config.getBoolean("set_home_with_beds", true);
         config.set("set_home_with_beds", setHomeWithBeds);
 
-        allowSpawnInJail = config.getBoolean("allow_spawn_in_jail", true);
+        allowSpawnInJail = config.getBoolean("allow_spawn_in_jail", false);
         config.set("allow_spawn_in_jail", allowSpawnInJail);
 
         saveConfig();
@@ -935,7 +935,7 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
 	public Location getWorkLoc(String playerName) {
 	    HashMap<Integer, HashMap<String, Object>> result = SSdb.select("world, x, y, z, yaw, pitch", "PlayerWorks", "player = '" + playerName + "'", null, null);
 	    Location location;
-	    if (result.isEmpty()) {
+	    if (result == null || result.isEmpty()) {
 	    	return null;
 	    } else {
 	        String world = (String)result.get(0).get("world");
@@ -964,7 +964,7 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
         jailName = jailName.toLowerCase();
         HashMap<Integer, HashMap<String, Object>> result = SSdb.select("world, x, y, z, yaw, pitch", "Jails", "name = '" + jailName + "'", null, null);
         Location location;
-        if (result.isEmpty()) {
+        if (result == null || result.isEmpty()) {
             return null;
         } else {
             String world = (String)result.get(0).get("world");
@@ -993,7 +993,7 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
     	releaseName = releaseName.toLowerCase();
         HashMap<Integer, HashMap<String, Object>> result = SSdb.select("world, x, y, z, yaw, pitch", "Releases", "name = '" + releaseName + "'", null, null);
         Location location;
-        if (result.isEmpty()) {
+        if (result == null || result.isEmpty()) {
             return null;
         } else {
             String world = (String)result.get(0).get("world");
@@ -1092,7 +1092,7 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
     public Location getDefaultSpawn() {
         HashMap<Integer, HashMap<String, Object>> result = SSdb.select("world, x, y, z, yaw, pitch", "DefaultSpawn", null, null, null);
         Location location;
-        if (result.isEmpty()) {
+        if (result == null || result.isEmpty()) {
             location = getServer().getWorlds().get(0).getSpawnLocation();
         } else {
             String world = (String)result.get(0).get("world");
@@ -1120,7 +1120,7 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
     public Location getWorldSpawn(String world) {
         HashMap<Integer, HashMap<String, Object>> result = SSdb.select("x, y, z, yaw, pitch", "WorldSpawns", "world = '" + world + "'", null, null);
         Location location;
-        if (result.isEmpty()) {
+        if (result == null || result.isEmpty()) {
             location = getServer().getWorld(world).getSpawnLocation();
         } else {
             double x = (Double)result.get(0).get("x");
@@ -1209,23 +1209,29 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
     @EventHandler (priority = EventPriority.NORMAL)
     public void onPlayerRespawn (PlayerRespawnEvent event) {
         Player player = event.getPlayer();
-        
+        Location respawn = null;
         removeImmuneFromJail(player);
         
         if (isJailed(player.getName())) {
-            event.setRespawnLocation(getJail(getWhereJailed(player.getName())));
+            respawn=getJail(getWhereJailed(player.getName()));
             getServer().broadcastMessage(player.getName() + ChatColor.GOLD + " has been jailed!");
         } else {
         	if(event.isBedSpawn() && !setHomeWithBeds) 
-        		event.setRespawnLocation(player.getBedSpawnLocation());
+        		respawn = player.getBedSpawnLocation();
         	else 
-        		event.setRespawnLocation(getHomeLoc(player));
+        		respawn = getHomeLoc(player);
         }
+
+        if (respawn == null) {
+        	respawn = player.getWorld().getSpawnLocation();
+        }
+        event.setRespawnLocation(respawn);
+
     }
 
     public void removeImmuneFromJail(Player player) {
-        if (isJailed(player.getName())) {
-            if (player.hasPermission("simplespawn.jail.immune")) {
+        if (player.hasPermission("simplespawn.jail.immune")) {
+            if (isJailed(player.getName())) {
                 setJailed(player.getName(), false, null);
                 getServer().broadcastMessage(player.getName() + ChatColor.GOLD + " was pardoned from serving jail time!");
             }
@@ -1236,8 +1242,7 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
     public void onPlayerInteract (PlayerInteractEvent event) {
         if (!event.isCancelled()) {
             Player player = event.getPlayer();
-            removeImmuneFromJail(player);
-
+ 
             if (event.getAction().equals(Action.RIGHT_CLICK_BLOCK) && event.getClickedBlock().getType().equals(Material.BED_BLOCK)) {
             	if (setHomeWithBeds) {
             		if (isJailed(player.getName())) {
@@ -1316,13 +1321,14 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
     
     @EventHandler (priority = EventPriority.NORMAL)
     public void onBlockBreak (BlockBreakEvent event) {
-        Player player = event.getPlayer();
-        removeImmuneFromJail(player);
-
-        if (isJailed(player.getName())) {
-            event.setCancelled(true);
-            player.sendMessage(ChatColor.RED + "You cannot break blocks while you're in jail!");
-        }
+    	if (!event.isCancelled()) {
+	        Player player = event.getPlayer();
+	
+	        if (isJailed(player.getName())) {
+	            event.setCancelled(true);
+	            player.sendMessage(ChatColor.RED + "You cannot break blocks while you're in jail!");
+	        }
+    	}
     }
     
     @EventHandler (priority = EventPriority.NORMAL)
@@ -1340,7 +1346,6 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
     public void onBlockIgnite (BlockIgniteEvent event) {
         if (!event.isCancelled() && event.getCause().equals(IgniteCause.FLINT_AND_STEEL)) {
             Player player = event.getPlayer();
-            removeImmuneFromJail(player);
 
             if (isJailed(player.getName())) {
                 event.setCancelled(true);
@@ -1353,7 +1358,6 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
     public void onPlayerEmptyBucket (PlayerBucketEmptyEvent event) {
         if (!event.isCancelled()) {
             Player player = event.getPlayer();
-            removeImmuneFromJail(player);
 
             if (isJailed(player.getName())) {
                 event.setCancelled(true);
@@ -1368,7 +1372,6 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
             Entity entity = event.getEntity();
             if (entity instanceof Player) {
                 Player player = (Player)entity;
-                removeImmuneFromJail(player);
 
                 if (isJailed(player.getName())) {
                     event.setCancelled(true);

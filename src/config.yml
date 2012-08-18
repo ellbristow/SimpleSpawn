@@ -19,5 +19,5 @@
 
 use_teleport_effect: true
 teleport_effect_type: 1
-set_home_with_beds: false
+set_home_with_beds: true
 allow_spawn_in_jail: false
