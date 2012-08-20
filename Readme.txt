@@ -1,3 +1,6 @@
+2.0.11
+  BugFix: Fighting/Damage in Jail
+
 2.0.10
   BugFix: Null Pointer exceptions on respawn in logfile
   Check for ImmunePlayer in Jail only during Join/Respawn
