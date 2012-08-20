@@ -1268,7 +1268,7 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
         if (!event.isCancelled()) {
             if (event.getCause().equals(TeleportCause.COMMAND)) {
                 Player player = event.getPlayer();
-                removeImmuneFromJail(player);
+                
                 if (isJailed(player.getName())) {
                     event.setTo(getJail(getWhereJailed(player.getName())));
                     player.sendMessage(ChatColor.RED + "You cannot teleport while you're in jail!");
@@ -1369,7 +1369,25 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
     @EventHandler (priority = EventPriority.NORMAL)
     public void onPlayerPVP (EntityDamageByEntityEvent event) {
         if (!event.isCancelled()) {
-            Entity entity = event.getEntity();
+            // Are you getting damaged?
+        	Entity entity = event.getEntity();
+            if (entity instanceof Player) {
+                Player player = (Player)entity;
+
+                if (isJailed(player.getName())) {
+                    event.setCancelled(true);
+                    player.sendMessage(ChatColor.RED + "You cannot be damaged while in jail!");
+                    // send notify to damager
+                    entity = event.getDamager();
+                    if (entity instanceof Player) {
+                    	player = (Player)entity;
+                    	player.sendMessage(ChatColor.RED + "You cannot fight with someone in jail!");
+                    }
+                }
+            }
+            
+            // Are you damaging others
+            entity = event.getDamager();
             if (entity instanceof Player) {
                 Player player = (Player)entity;
 
@@ -1380,4 +1398,4 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
             }
         }
     }
-}
+ }
