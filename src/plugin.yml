@@ -1,6 +1,6 @@
 name: SimpleSpawn
 main: me.ellbristow.SimpleSpawn.SimpleSpawn
-version: 2.0.11
+version: 2.0.12
 database: true
 author: ellbristow, dh1jc
 dev-url: http://dev.bukkit.org/server-mods/simplespawn
@@ -72,7 +72,7 @@ permissions:
       simplespawn.set.default: true
       simplespawn.use: true
       simplespawn.use.default: true
-      simplespawn.use.worlds: true
+      simplespawn.use.world: true
       simplespawn.home.*: true
       simplespawn.work.*: true
       simplespawn.jail.*: true
@@ -126,7 +126,7 @@ permissions:
   simplespawn.use:
     default: op
     description: Access to /spawn
-  simplespawn.use.worlds:
+  simplespawn.use.world:
     default: op
     description: Access to /spawn {worldName}
   simplespawn.home.set:

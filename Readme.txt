@@ -1,3 +1,6 @@
+2.0.12
+  BugFix: Index Out of Bound Exception when using /spawn {world} 
+  
 2.0.11
   BugFix: Fighting/Damage in Jail
 

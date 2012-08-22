@@ -188,7 +188,7 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
                 simpleTeleport(player, getWorldSpawn(player.getWorld().getName()));
                 return true;
             } else if (args.length == 1)  {
-            	if (args[1].equalsIgnoreCase("*default")) {
+            	if (args[0].equalsIgnoreCase("*default")) {
                 	if (!player.hasPermission("simplespawn.use.default")) {
                         player.sendMessage(ChatColor.RED + "You do not have permission to use that command!");
                         return false;
