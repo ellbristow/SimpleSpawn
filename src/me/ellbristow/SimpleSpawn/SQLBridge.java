@@ -18,14 +18,14 @@ public class SQLBridge {
         sqlFile = new File(plugin.getDataFolder() + File.separator + plugin.getName() + ".db");
     }
     
-    public Connection getConnection() {
+    public synchronized Connection getConnection() {
         if (conn == null) {
             return open();
         }
         return conn;
     }
     
-    public Connection open() {    	
+    public synchronized Connection open() {    	
         try {
             conn = DriverManager.getConnection("jdbc:sqlite:" + sqlFile.getAbsolutePath());
             return conn;
@@ -35,7 +35,7 @@ public class SQLBridge {
         return null;
     }
     
-    public void close() {
+    public synchronized void close() {
         if (conn !=null) {
             try {
                 conn.close();
