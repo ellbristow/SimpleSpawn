@@ -584,7 +584,7 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
                 if (target.isOnline()) {
                     Player targetPlayer = target.getPlayer();
                     if (!targetPlayer.hasPermission("simplespawn.jail.immune")) {
-                        targetPlayer.teleport(getJail("default"), TeleportCause.PLUGIN);
+                    	simpleTeleport(targetPlayer, getJail("default"));
                         setJailed(target.getName(), true, "default");
                         getServer().broadcastMessage(target.getName() + ChatColor.GOLD + " has been jailed!");
                         return true;
@@ -615,7 +615,7 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
                 if (target.isOnline()) {
                     Player targetPlayer = target.getPlayer();
                     if (!targetPlayer.hasPermission("simplespawn.jail.immune")) {
-                        targetPlayer.teleport(getJail(args[1]), TeleportCause.PLUGIN);
+                    	simpleTeleport(targetPlayer, getJail(args[1]));
                         setJailed(target.getName(), true, args[1]);
                         getServer().broadcastMessage(target.getName() + ChatColor.GOLD + " has been jailed!");
                         return true;
@@ -805,6 +805,9 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
     }
 
     public void simpleTeleport(Player player, Location loc) {
+    	if (loc == null)
+    			return;
+    	
         Location leftLoc = player.getLocation();
         switch (tpEffect) {
         case 0:
@@ -825,7 +828,7 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
             }
         break;
         }
-        player.teleport(loc);
+        player.teleport(loc, TeleportCause.PLUGIN);
         switch (tpEffect) {
         case 0:
             loc.getWorld().strikeLightningEffect(loc);
@@ -1195,13 +1198,13 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
     public void onPlayerJoin (PlayerJoinEvent event) {
         Player player = event.getPlayer();
         if (!player.hasPlayedBefore()) {
-            player.teleport(getDefaultSpawn(), TeleportCause.PLUGIN);
+        	simpleTeleport(player, getDefaultSpawn());
             return;
         }
         removeImmuneFromJail(player);
 
         if (isJailed(player.getName())) {
-            player.teleport(getJail(getWhereJailed(player.getName())) ,TeleportCause.PLUGIN);
+            simpleTeleport(player, getJail(getWhereJailed(player.getName())));
             getServer().broadcastMessage(player.getName() + ChatColor.GOLD + " has been jailed!");
         }
     }

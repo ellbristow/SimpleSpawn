@@ -1,15 +1,12 @@
 name: SimpleSpawn
 main: me.ellbristow.SimpleSpawn.SimpleSpawn
-version: 2.0.12
+version: 2.0.13
 database: true
 author: ellbristow, dh1jc
 dev-url: http://dev.bukkit.org/server-mods/simplespawn
 description: >
              Set the world's spawn location
 commands:
-  dummy:
-    description: Dummy
-    usage: /dummy
   setspawn:
     description: Set spawn location
     usage: /setspawn [*default]
