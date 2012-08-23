@@ -1,3 +1,7 @@
+2.0.13
+  BugFix: SQLite Bride handling now synchronized to be thread safe
+  BugFix: getHome locations might throw null pointer.
+ 
 2.0.12
   BugFix: Index Out of Bound Exception when using /spawn {world} 
   

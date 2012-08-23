@@ -26,6 +26,7 @@ public class SQLBridge {
     }
     
     public synchronized Connection open() {    	
+    	plugin.getLogger().fine("sqlite connection needs to be established");
         try {
             conn = DriverManager.getConnection("jdbc:sqlite:" + sqlFile.getAbsolutePath());
             return conn;
@@ -36,7 +37,8 @@ public class SQLBridge {
     }
     
     public synchronized void close() {
-        if (conn !=null) {
+        if (conn != null) {
+        	plugin.getLogger().fine("sqlite connection needs to be closed");
             try {
                 conn.close();
             } catch (Exception e) {
