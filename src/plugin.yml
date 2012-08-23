@@ -1,6 +1,6 @@
 name: SimpleSpawn
 main: me.ellbristow.SimpleSpawn.SimpleSpawn
-version: 2.0.5
+version: 2.0.13
 database: true
 author: ellbristow, dh1jc
 dev-url: http://dev.bukkit.org/server-mods/simplespawn
@@ -19,9 +19,15 @@ commands:
   home:
     description: Teleport to home location
     usage: /home {player}
+  removehome:
+    description: Removes home location.
+    usage: /removehome {player}  
   setwork:
     description: Set work location.
     usage: /setwork {player}
+  removework:
+    description: Removes work location.
+    usage: /removework {player}  
   work:
     description: Teleport to work location
     usage: /work {player}
@@ -63,25 +69,31 @@ permissions:
       simplespawn.set.default: true
       simplespawn.use: true
       simplespawn.use.default: true
-      simplespawn.use.worlds: true
+      simplespawn.use.world: true
       simplespawn.home.*: true
       simplespawn.work.*: true
       simplespawn.jail.*: true
       simplespawn.release.*: true
   simplespawn.home.*:
-    description: Access to /home and /sethome
+    description: Access to /home and /sethome, /removehome
     children:
       simplespawn.home.set: true
       simplespawn.home.set.others: true
+      simplespawn.home.remove: true
+      simplespawn.home.remove.others: true
       simplespawn.home.use: true
       simplespawn.home.use.others: true
+      simplespawn.home.use.offline: true
   simplespawn.work.*:
-    description: Access to /work and /setwork
+    description: Access to /work and /setwork, /removework
     children:
       simplespawn.work.set: true
       simplespawn.work.set.others: true
+      simplespawn.work.remove: true
+      simplespawn.work.remove.others: true
       simplespawn.work.use: true
       simplespawn.work.use.others: true
+      simplespawn.work.use.offline: true
   simplespawn.release.*:
     description: Access to /removerelease and /setrelease
     children:
@@ -111,7 +123,7 @@ permissions:
   simplespawn.use:
     default: op
     description: Access to /spawn
-  simplespawn.use.worlds:
+  simplespawn.use.world:
     default: op
     description: Access to /spawn {worldName}
   simplespawn.home.set:
@@ -120,10 +132,19 @@ permissions:
   simplespawn.home.set.others:
     default: false
     description: Access to /sethome {playerName}
+  simplespawn.home.remove:
+    default: true
+    description: Access to /removehome
+  simplespawn.home.remove.others:
+    default: false
+    description: Access to /removehome {playerName}
   simplespawn.home.use:
     default: true
     description: Access to /home
   simplespawn.home.use.others:
+    default: false
+    description: Access to /home {playerName}
+  simplespawn.home.use.offline:
     default: false
     description: Access to /home {playerName}
   simplespawn.work.set:
@@ -132,10 +153,19 @@ permissions:
   simplespawn.work.set.others:
     default: false
     description: Access to /setwork {playerName}
+  simplespawn.work.remove:
+    default: true
+    description: Access to /removework
+  simplespawn.work.remove.others:
+    default: false
+    description: Access to /removework {playerName}
   simplespawn.work.use:
     default: false
     description: Access to /work
   simplespawn.work.use.others:
+    default: false
+    description: Access to /work {playerName}
+  simplespawn.work.use.offline:
     default: false
     description: Access to /work {playerName}
   simplespawn.jail.use:

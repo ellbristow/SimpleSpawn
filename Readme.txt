@@ -1,3 +1,34 @@
+2.0.13
+  BugFix: SQLite Bride handling now synchronized to be thread safe
+  BugFix: getHome locations might throw null pointer.
+ 
+2.0.12
+  BugFix: Index Out of Bound Exception when using /spawn {world} 
+  
+2.0.11
+  BugFix: Fighting/Damage in Jail
+
+2.0.10
+  BugFix: Null Pointer exceptions on respawn in logfile
+  Check for ImmunePlayer in Jail only during Join/Respawn
+
+2.0.9
+  BugFix: Problem with sqlite on Win7, 64bit [database locked]
+  
+2.0.8
+  BugFix: reported problem on respawn and destoryed beds - fixed
+  Added message when releasing OfflinePlayers from Jail as they are not been send to release point.
+
+2.0.7
+  BugFix: teleporting home after using bed in Jails - fixed
+  BugFix: sql delete statements corrected
+  Added /removehome {other} /removework {other}
+  Permission: simplespawn.home.remove, simplespawn.home.remove.other
+  	simplespawn.work.remove, simplespawn.work.remove.other
+  
+2.0.6
+  Bugfix /home /work with offinusers
+  new pemission simplespawn.home.use.offine, simplespawn.work.use.offine
 
 2.0.5
   Commands	/setrelease {jailName} /removerelease
