@@ -1,4 +1,5 @@
 2.0.13
+  Added: Disableable Teleport sound effect (Enderman Noise) (Requires 1.3.2)
   BugFix: SQLite Bride handling now synchronized to be thread safe
   BugFix: getHome locations might throw null pointer.
  

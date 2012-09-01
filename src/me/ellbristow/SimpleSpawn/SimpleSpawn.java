@@ -1,18 +1,9 @@
-	package me.ellbristow.SimpleSpawn;
+package me.ellbristow.SimpleSpawn;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Writer;
+import java.io.*;
 import java.util.HashMap;
 import java.util.List;
-import org.bukkit.ChatColor;
-import org.bukkit.Effect;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -28,11 +19,7 @@ import org.bukkit.event.block.BlockIgniteEvent;
 import org.bukkit.event.block.BlockIgniteEvent.IgniteCause;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.player.PlayerBucketEmptyEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerRespawnEvent;
-import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -42,7 +29,8 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
     public static SimpleSpawn plugin;
     protected FileConfiguration config;
     private SQLBridge SSdb;
-    public int tpEffect = -1; // -1 = off
+    private int tpEffect = -1; // -1 = off
+    private boolean useTpSound = true;
     private boolean setHomeWithBeds = false;
     private boolean allowSpawnInJail = false;
    
@@ -62,14 +50,15 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
     @Override
     public void onDisable() {
         SSdb.close();
-        getLogger().info("SimpleSpawn disabled");
     }
 
     @Override
     public void onEnable() {
         config = getConfig();
         boolean useTpEffect = config.getBoolean("use_teleport_effect", true);
+        useTpSound = config.getBoolean("use_teleport_sound", true);
         config.set("use_teleport_effect", useTpEffect);
+        config.set("use_teleport_sound", useTpSound);
         if (useTpEffect) {
             tpEffect = config.getInt("teleport_effect_type", 1);
             config.set("teleport_effect_type", tpEffect);
@@ -824,9 +813,12 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
 
     public void simpleTeleport(Player player, Location loc) {
     	if (loc == null)
-    			return;
+            return;
     	
         Location leftLoc = player.getLocation();
+        if (useTpSound) {
+            leftLoc.getWorld().playSound(leftLoc, Sound.ENDERMAN_TELEPORT, 1, 1);
+        }
         switch (tpEffect) {
         case 0:
             player.getWorld().strikeLightningEffect(leftLoc);
@@ -847,6 +839,9 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
         break;
         }
         player.teleport(loc, TeleportCause.PLUGIN);
+        if (useTpSound) {
+            loc.getWorld().playSound(loc, Sound.ENDERMAN_TELEPORT, 1, 1);
+        }
         switch (tpEffect) {
         case 0:
             loc.getWorld().strikeLightningEffect(loc);
@@ -1232,7 +1227,7 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
     @EventHandler (priority = EventPriority.NORMAL)
     public void onPlayerRespawn (PlayerRespawnEvent event) {
         Player player = event.getPlayer();
-        Location respawn = null;
+        Location respawn;
         removeImmuneFromJail(player);
         
         if (isJailed(player.getName())) {

@@ -48,7 +48,7 @@ public class SQLBridge {
     }
     
     public boolean checkTable(String tableName) {
-        DatabaseMetaData dbm = null;
+        DatabaseMetaData dbm;
         try {
             dbm = getConnection().getMetaData();
             ResultSet tables = dbm.getTables(null, null, tableName, null);
