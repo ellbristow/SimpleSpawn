@@ -154,7 +154,7 @@ permissions:
     default: false
     description: Access to /setwork {playerName}
   simplespawn.work.remove:
-    default: true
+    default: false
     description: Access to /removework
   simplespawn.work.remove.others:
     default: false
