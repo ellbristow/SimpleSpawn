@@ -821,7 +821,7 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
         }
         switch (tpEffect) {
         case 0:
-            player.getWorld().strikeLightningEffect(leftLoc);
+            leftLoc.getWorld().strikeLightningEffect(leftLoc);
         break;
         default:
             leftLoc.setY(leftLoc.getY() + 1);
@@ -864,7 +864,7 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
         }
         player.sendMessage(ChatColor.GOLD + "WHOOSH!");
     }
-
+   
     public void setBedLoc(Player player) {
     	Location homeLoc = player.getLocation();
         setHomeLoc(player);
@@ -1290,11 +1290,13 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
                 if (isJailed(player.getName())) {
                     event.setTo(getJail(getWhereJailed(player.getName())));
                     player.sendMessage(ChatColor.RED + "You cannot teleport while you're in jail!");
+                    event.setCancelled(true);
+                    return;
                 }
                 Location leftLoc = event.getFrom();
                 switch (tpEffect) {
                 case 0:
-                    player.getWorld().strikeLightningEffect(leftLoc);
+                    leftLoc.getWorld().strikeLightningEffect(leftLoc);
                 break;
                 default:
                     leftLoc.setY(leftLoc.getY() + 1);
