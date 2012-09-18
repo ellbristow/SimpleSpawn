@@ -29,8 +29,10 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
     public static SimpleSpawn plugin;
     protected FileConfiguration config;
     private SQLBridge SSdb;
-    private int tpEffect = -1; // -1 = off
+    private int tpEffect = 1;
+    private int soundEffect = 1;
     private boolean useTpSound = true;
+    private boolean useTpEffect = true;
     private boolean setHomeWithBeds = false;
     private boolean allowSpawnInJail = false;
    
@@ -55,17 +57,25 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
     @Override
     public void onEnable() {
         config = getConfig();
-        boolean useTpEffect = config.getBoolean("use_teleport_effect", true);
+        useTpEffect = config.getBoolean("use_teleport_effect", true);
         useTpSound = config.getBoolean("use_teleport_sound", true);
         config.set("use_teleport_effect", useTpEffect);
         config.set("use_teleport_sound", useTpSound);
-        if (useTpEffect) {
-            tpEffect = config.getInt("teleport_effect_type", 1);
-            config.set("teleport_effect_type", tpEffect);
-        } else {
-            config.set("teleport_effect_type", config.getInt("teleport_effect_type", 1));
-        }
         
+        // Pessimism... a lot of people are not using 1.3.2 so just to be sure SOUND class exists.
+        try {
+        	Class.forName("org.bukkit.Sound" );
+        } catch (ClassNotFoundException e) {
+        	getLogger().info("Sound is disabled, because your bukkit version doesn't support it!");
+        	useTpSound=false;
+        }
+     
+        tpEffect = config.getInt("teleport_effect_type", 1);
+        config.set("teleport_effect_type", tpEffect);
+
+        soundEffect = config.getInt("sound_effect_type", 1);
+        config.set("sound_effect_type", soundEffect);
+
         setHomeWithBeds = config.getBoolean("set_home_with_beds", true);
         config.set("set_home_with_beds", setHomeWithBeds);
 
@@ -127,7 +137,6 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
         Player player = (Player) sender;
         Boolean playerIsJailed = isJailed(player.getName());
         if (commandLabel.equalsIgnoreCase("setspawn")) {
-
             if (args.length == 0) {
             	if (!player.hasPermission("simplespawn.set")) {
                     player.sendMessage(ChatColor.RED + "You do not have permission to set the spawn location!");
@@ -815,53 +824,14 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
     	if (loc == null)
             return;
     	
-        Location leftLoc = player.getLocation();
-        if (useTpSound) {
-            leftLoc.getWorld().playSound(leftLoc, Sound.ENDERMAN_TELEPORT, 1, 1);
-        }
-        switch (tpEffect) {
-        case 0:
-            leftLoc.getWorld().strikeLightningEffect(leftLoc);
-        break;
-        default:
-            leftLoc.setY(leftLoc.getY() + 1);
-            switch (tpEffect) {
-            case 1:
-                leftLoc.getWorld().playEffect(leftLoc, Effect.ENDER_SIGNAL, 0);
-            break;
-            case 2:
-                leftLoc.getWorld().playEffect(leftLoc, Effect.SMOKE, 0);
-            break;
-            case 3:
-                leftLoc.getWorld().playEffect(leftLoc, Effect.MOBSPAWNER_FLAMES, 0);
-            break;
-            }
-        break;
-        }
+        Location fromLoc = player.getLocation();
+        playSound(fromLoc);
+        playEffect(fromLoc);
+        
         player.teleport(loc, TeleportCause.PLUGIN);
-        if (useTpSound) {
-            loc.getWorld().playSound(loc, Sound.ENDERMAN_TELEPORT, 1, 1);
-        }
-        switch (tpEffect) {
-        case 0:
-            loc.getWorld().strikeLightningEffect(loc);
-        break;
-        default:
-            Location newLoc = new Location(loc.getWorld(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
-            newLoc.setY(newLoc.getY() + 1);
-            switch (tpEffect) {
-            case 1:
-                newLoc.getWorld().playEffect(newLoc, Effect.ENDER_SIGNAL, 0);
-            break;
-            case 2:
-                newLoc.getWorld().playEffect(newLoc, Effect.SMOKE, 0);
-            break;
-            case 3:
-                newLoc.getWorld().playEffect(newLoc, Effect.MOBSPAWNER_FLAMES, 0);
-            break;
-            }
-        break;
-        }
+
+        playSound(loc);
+        playEffect(loc);
         player.sendMessage(ChatColor.GOLD + "WHOOSH!");
     }
    
@@ -1293,47 +1263,15 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
                     event.setCancelled(true);
                     return;
                 }
-                Location leftLoc = event.getFrom();
-                switch (tpEffect) {
-                case 0:
-                    leftLoc.getWorld().strikeLightningEffect(leftLoc);
-                break;
-                default:
-                    leftLoc.setY(leftLoc.getY() + 1);
-                    switch (tpEffect) {
-                    case 1:
-                        leftLoc.getWorld().playEffect(leftLoc, Effect.ENDER_SIGNAL, 0);
-                    break;
-                    case 2:
-                        leftLoc.getWorld().playEffect(leftLoc, Effect.SMOKE, 0);
-                    break;
-                    case 3:
-                        leftLoc.getWorld().playEffect(leftLoc, Effect.MOBSPAWNER_FLAMES, 0);
-                    break;
-                    }
-                break;
-                }
-                Location loc = event.getTo();
-                switch (tpEffect) {
-                case 0:
-                    loc.getWorld().strikeLightningEffect(loc);
-                break;
-                default:
-                    Location newLoc = new Location(loc.getWorld(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
-                    newLoc.setY(newLoc.getY() + 1);
-                    switch (tpEffect) {
-                    case 1:
-                        newLoc.getWorld().playEffect(newLoc, Effect.ENDER_SIGNAL, 0);
-                    break;
-                    case 2:
-                        newLoc.getWorld().playEffect(newLoc, Effect.SMOKE, 0);
-                    break;
-                    case 3:
-                        newLoc.getWorld().playEffect(newLoc, Effect.MOBSPAWNER_FLAMES, 0);
-                    break;
-                    }
-                break;
-                }
+                
+                Location fromLoc = event.getFrom();
+                playSound(fromLoc);
+                playEffect(fromLoc);
+                
+                Location toLoc = event.getTo();
+                
+                playSound(toLoc);
+                playEffect(toLoc);
                 player.sendMessage(ChatColor.GOLD + "WHOOSH!");
             }
         }
@@ -1419,4 +1357,51 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
             }
         }
     }
+    
+    public void playSound (Location loc) {
+    	if (useTpSound) {
+    		switch (soundEffect) {
+    		case 0:
+    			loc.getWorld().playSound(loc, Sound.AMBIENCE_THUNDER, 1, 1);
+    			break;
+    		case 1:
+    			loc.getWorld().playSound(loc, Sound.ENDERMAN_TELEPORT, 1, 1);
+    			break;
+    		case 2:
+    			loc.getWorld().playSound(loc, Sound.FIRE, 1, 1);
+    			break;
+    		case 3:
+    			loc.getWorld().playSound(loc, Sound.EXPLODE, 1, 1);
+    			break;    			
+    		case 4:
+    			loc.getWorld().playSound(loc, Sound.FIZZ, 1, 1);
+    			break;    			
+    		case 5:
+    			loc.getWorld().playSound(loc, Sound.PORTAL_TRIGGER, 1, 1);
+    			break;    			
+    		}
+    	}
+    }
+    
+    public void playEffect (Location loc) {
+        switch (tpEffect) {
+        case 0:
+            loc.getWorld().strikeLightningEffect(loc);
+        break;
+        default:
+            loc.setY(loc.getY() + 1);
+            switch (tpEffect) {
+            case 1:
+                loc.getWorld().playEffect(loc, Effect.ENDER_SIGNAL, 0);
+                break;
+            case 2:
+                loc.getWorld().playEffect(loc, Effect.SMOKE, 0);
+                break;
+            case 3:
+                loc.getWorld().playEffect(loc, Effect.MOBSPAWNER_FLAMES, 0);
+                break;
+            }
+        break;
+        }
+    }   
  }

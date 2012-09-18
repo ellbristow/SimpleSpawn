@@ -10,6 +10,10 @@
 # teleport_effect_type : Which effect should be played on teleport?
 # Allowed: 0 = Lightning, 1 = Ender Signal (default), 2 = Smoke, 3 = Flames
 # 
+# sound_effect_type : Which sound should be played on teleport?
+# Allowed: 0 = Ambience Thunder, 1 = Ender Teleport (default), 2 = Fire, 3 = Explode, 
+#          4 = Fizz, 5 = Portal trigger
+# 
 # set_home_with_beds: Set home Location when using a bed?
 # Allowed: true|false
 # 
@@ -19,6 +23,7 @@
 
 use_teleport_effect: true
 use_teleport_sound: true
+sound_effect_type: 1
 teleport_effect_type: 1
 set_home_with_beds: true
 allow_spawn_in_jail: false
