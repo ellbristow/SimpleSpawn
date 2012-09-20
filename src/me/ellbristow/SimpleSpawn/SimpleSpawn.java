@@ -1384,24 +1384,26 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
     }
     
     public void playEffect (Location loc) {
-        switch (tpEffect) {
-        case 0:
-            loc.getWorld().strikeLightningEffect(loc);
-        break;
-        default:
-            loc.setY(loc.getY() + 1);
-            switch (tpEffect) {
-            case 1:
-                loc.getWorld().playEffect(loc, Effect.ENDER_SIGNAL, 0);
-                break;
-            case 2:
-                loc.getWorld().playEffect(loc, Effect.SMOKE, 0);
-                break;
-            case 3:
-                loc.getWorld().playEffect(loc, Effect.MOBSPAWNER_FLAMES, 0);
-                break;
-            }
-        break;
-        }
+    	if (useTpEffect) {
+	        switch (tpEffect) {
+	        case 0:
+	            loc.getWorld().strikeLightningEffect(loc);
+	        break;
+	        default:
+	            loc.setY(loc.getY() + 1);
+	            switch (tpEffect) {
+	            case 1:
+	                loc.getWorld().playEffect(loc, Effect.ENDER_SIGNAL, 0);
+	                break;
+	            case 2:
+	                loc.getWorld().playEffect(loc, Effect.SMOKE, 0);
+	                break;
+	            case 3:
+	                loc.getWorld().playEffect(loc, Effect.MOBSPAWNER_FLAMES, 0);
+	                break;
+	            }
+	        break;
+	        }
+    	}
     }   
  }
