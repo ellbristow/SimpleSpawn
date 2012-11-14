@@ -26,7 +26,7 @@ public class SQLBridge {
     }
     
     public synchronized Connection open() {    	
-    	plugin.getLogger().fine("sqlite connection needs to be established");
+    	plugin.getLogger().finest("sqlite connection needs to be established");
         try {
             conn = DriverManager.getConnection("jdbc:sqlite:" + sqlFile.getAbsolutePath());
             return conn;
@@ -38,7 +38,7 @@ public class SQLBridge {
     
     public synchronized void close() {
         if (conn != null) {
-        	plugin.getLogger().fine("sqlite connection needs to be closed");
+        	plugin.getLogger().finest("sqlite connection needs to be closed");
             try {
                 conn.close();
             } catch (Exception e) {
@@ -49,6 +49,8 @@ public class SQLBridge {
     
     public boolean checkTable(String tableName) {
         DatabaseMetaData dbm;
+        plugin.getLogger().finest("Executing SQLite check for table "+tableName);
+
         try {
             dbm = getConnection().getMetaData();
             ResultSet tables = dbm.getTables(null, null, tableName, null);
@@ -86,6 +88,8 @@ public class SQLBridge {
 
     public ResultSet query(String query) {        
         ResultSet results = null;
+        plugin.getLogger().finest("Executing SQLite query "+query);
+
         try {
             statement = getConnection().createStatement();
             results = statement.executeQuery(query);
