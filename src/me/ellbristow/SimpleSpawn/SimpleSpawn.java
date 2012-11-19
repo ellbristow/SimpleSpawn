@@ -1446,7 +1446,7 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
     @EventHandler (priority = EventPriority.NORMAL)
     public void onPlayerRespawn (PlayerRespawnEvent event) {
         Player player = event.getPlayer();
-        Location respawn;
+        Location respawn=null;
         removeImmuneFromJail(player);
         
         if (isJailed(player.getName())) {
@@ -1469,7 +1469,6 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
         	respawn = player.getWorld().getSpawnLocation();
         }
         event.setRespawnLocation(respawn);
-
     }
 
     public void removeImmuneFromJail(Player player) {
@@ -1495,7 +1494,7 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
             		} else {
             			setBedLoc(player);
                         getLogger().finer("Player "+player.getName()+" your home is set to bed location.");
-            			player.sendMessage(ChatColor.GOLD + "Your home has been set to this location!");
+            			player.sendMessage(ChatColor.GOLD + "Your home has been set to this bed location!");
             		}
             	}
         	} else {

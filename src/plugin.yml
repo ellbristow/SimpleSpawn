@@ -116,7 +116,7 @@ permissions:
       simplespawn.jail.inmates: true
       simplespawn.jail.list: true
   simplespawn.back:
-    default: true
+    default: op
     description: Access to /back     
   simplespawn.use.default:
     default: op
