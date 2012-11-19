@@ -4,7 +4,6 @@ import java.io.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
-
 import org.bukkit.*;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -1045,7 +1044,7 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
         double z = loc.getZ();
         float yaw = loc.getYaw();
         float pitch = loc.getPitch();
-        SSdb.query("INSERT OR REPLACE INTO BackSpawn (player, world, x, y, z, yaw, pitch) VALUES ('" + playerName + "', '" + world + "', " + x + ", " + y + ", " + z + ", " + yaw + ", " + pitch + ")");
+        SSdb.query("INSERT OR REPLACE INTO BackSpawns (player, world, x, y, z, yaw, pitch) VALUES ('" + playerName + "', '" + world + "', " + x + ", " + y + ", " + z + ", " + yaw + ", " + pitch + ")");
     }
     
     public void setBedLoc(Player player) {
