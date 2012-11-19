@@ -41,6 +41,8 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
       
     private String[] spawnColumns = {"world", "x", "y", "z", "yaw", "pitch"};
     private String[] spawnDims = {"TEXT NOT NULL PRIMARY KEY", "DOUBLE NOT NULL DEFAULT 0", "DOUBLE NOT NULL DEFAULT 0", "DOUBLE NOT NULL DEFAULT 0", "FLOAT NOT NULL DEFAULT 0", "FLOAT NOT NULL DEFAULT 0"};
+    private String[] backColumns = {"player", "world", "x", "y", "z", "yaw", "pitch"};
+    private String[] backDims = {"TEXT NOT NULL PRIMARY KEY", "TEXT NOT NULL", "DOUBLE NOT NULL DEFAULT 0", "DOUBLE NOT NULL DEFAULT 0", "DOUBLE NOT NULL DEFAULT 0", "FLOAT NOT NULL DEFAULT 0", "FLOAT NOT NULL DEFAULT 0"};
     private String[] homeColumns = {"player", "world", "x", "y", "z", "yaw", "pitch"};
     private String[] homeDims = {"TEXT NOT NULL PRIMARY KEY", "TEXT NOT NULL", "DOUBLE NOT NULL DEFAULT 0", "DOUBLE NOT NULL DEFAULT 0", "DOUBLE NOT NULL DEFAULT 0", "FLOAT NOT NULL DEFAULT 0", "FLOAT NOT NULL DEFAULT 0"};
     private String[] workColumns = {"player", "world", "x", "y", "z", "yaw", "pitch"};
@@ -120,6 +122,10 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
             if (!SSdb.checkTable("WorldSpawns")) {
 			    getLogger().info("Created table WorldSpawns in SimpleSpawn.db");
                 SSdb.createTable("WorldSpawns", spawnColumns, spawnDims);
+            }
+            if (!SSdb.checkTable("BackSpawns")) {
+			    getLogger().info("Created table BackSpawns in SimpleSpawn.db");
+                SSdb.createTable("BackSpawns", backColumns, backDims);
             }
             if (!SSdb.checkTable("PlayerHomes")) {
 			    getLogger().info("Created table PlayerHomes in SimpleSpawn.db");
@@ -265,6 +271,54 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
                 return false;
             }
         	
+        } else if (commandLabel.equalsIgnoreCase("back")) {
+            if (args.length == 0) {
+                if (!player.hasPermission("simplespawn.back")) {
+                        getLogger().fine("Player "+player.getName()+" has no simplespawn.back permission.");
+                    player.sendMessage(ChatColor.RED + "You do not have permission to use that command!");
+                    return false;
+                }
+                if (playerIsJailed && !allowSpawnInJail) {
+                        getLogger().fine("Player "+player.getName()+" cannot go back while in jail.");
+                	player.sendMessage(ChatColor.RED + "You cannot go back while in jail!");
+                    return false;
+                }                    
+                Location backLoc = getBackLoc(player.getName());
+                    getLogger().finer("Player "+player.getName()+" goes to previous location.");
+                simpleTeleport(player, backLoc);
+                return true;
+             } else if (args.length == 1) {
+            	if (!player.hasPermission("simplespawn.home.use.others")) {
+        			getLogger().fine("Player "+player.getName()+" has no simplespawn.home.use.others permission.");
+                    player.sendMessage(ChatColor.RED + "You do not have permission to use that command to spawn to others home!");
+                    return false;
+                }
+                if (playerIsJailed && !allowSpawnInJail) {
+        			getLogger().fine("Player "+player.getName()+" cannot go to others home while in jail.");
+                	player.sendMessage(ChatColor.RED + "You cannot go to others home while in jail!");
+                    return false;
+                }                    
+            	OfflinePlayer target = getServer().getOfflinePlayer(args[0]);
+                if (!target.hasPlayedBefore()) {
+        			getLogger().fine("Player "+player.getName()+" tries to go to home location of unkown user "+target.getName()+".");
+                    player.sendMessage(ChatColor.RED + "Player '" + ChatColor.WHITE + args[0] + ChatColor.RED + "' not found!");
+                    return false;
+                }
+            	if (!target.isOnline() && !player.hasPermission("simplespawn.home.use.offline")) {
+        			getLogger().fine("Player "+player.getName()+" has no simplespawn.home.use.offline permission.");
+                    player.sendMessage(ChatColor.RED + "You do not have permission to use that command to spawn to offline players home!");
+                    return false;            	
+            	}
+                Location homeLoc = getHomeLoc(target.getName());
+                if (homeLoc == null) {
+        			getLogger().fine("Player "+player.getName()+" tries to go to home location of user "+target.getName()+" but that user has no home.");
+                	player.sendMessage(ChatColor.RED + "Can't find " + ChatColor.WHITE + args[0] + ChatColor.RED + "'s home or bed!");
+                	return false;
+                }
+                getLogger().finer("Player "+player.getName()+" goes to home location of "+target.getName()+".");
+                simpleTeleport(player, homeLoc);
+                return true;           	 
+             }
         } else if (commandLabel.equalsIgnoreCase("sethome")) {
             if (args.length == 0) {
                 if (!player.hasPermission("simplespawn.home.set")) {
@@ -984,6 +1038,16 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
         player.sendMessage(ChatColor.GOLD + "WHOOSH!");
     }
    
+    public void setBackLoc(String playerName, Location loc) {
+        String world = loc.getWorld().getName();
+        double x = loc.getX();
+        double y = loc.getY();
+        double z = loc.getZ();
+        float yaw = loc.getYaw();
+        float pitch = loc.getPitch();
+        SSdb.query("INSERT OR REPLACE INTO BackSpawn (player, world, x, y, z, yaw, pitch) VALUES ('" + playerName + "', '" + world + "', " + x + ", " + y + ", " + z + ", " + yaw + ", " + pitch + ")");
+    }
+    
     public void setBedLoc(Player player) {
     	Location homeLoc = player.getLocation();
         setHomeLoc(player);
@@ -1012,6 +1076,25 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
         SSdb.query("INSERT OR REPLACE INTO PlayerHomes (player, world, x, y, z, yaw, pitch) VALUES ('" + target.getName() + "', '" + world + "', " + x + ", " + y + ", " + z + ", " + yaw + ", " + pitch + ")");
     }
 
+    public Location getBackLoc(String playerName) {
+        HashMap<Integer, HashMap<String, Object>> result = SSdb.select("world, x, y, z, yaw, pitch", "BackSpawns", "player = '" + playerName + "'", null, null);
+        Location location;
+        if (result == null || result.isEmpty()) {
+        	// if you haven't used /sethome - first home is your bed
+        	getLogger().finest("No previous location found for "+playerName+", trying to retrieve bedspawn.");
+        	location = getServer().getOfflinePlayer(playerName).getBedSpawnLocation();
+        } else {
+            String world = (String)result.get(0).get("world");
+            double x = (Double)result.get(0).get("x");
+            double y = (Double)result.get(0).get("y");
+            double z = (Double)result.get(0).get("z");
+            float yaw = Float.parseFloat(result.get(0).get("yaw").toString());
+            float pitch = Float.parseFloat(result.get(0).get("pitch").toString());
+            location = new Location(getServer().getWorld(world), x, y, z, yaw, pitch);
+        }
+        return location;
+    }
+    
     public Location getHomeLoc(String playerName) {
         HashMap<Integer, HashMap<String, Object>> result = SSdb.select("world, x, y, z, yaw, pitch", "PlayerHomes", "player = '" + playerName + "'", null, null);
         Location location;
@@ -1443,6 +1526,9 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
                 }
                 
                 Location fromLoc = event.getFrom();
+                
+                setBackLoc(player.getName(), fromLoc);
+                
                 playSound(fromLoc);
                 playEffect(fromLoc);
                 
