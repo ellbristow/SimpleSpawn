@@ -20,6 +20,7 @@ import org.bukkit.event.block.BlockIgniteEvent;
 import org.bukkit.event.block.BlockIgniteEvent.IgniteCause;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.plugin.PluginManager;
@@ -1510,6 +1511,16 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
         }
     }
 
+    @EventHandler (priority = EventPriority.NORMAL)
+    public void onPlayerDeath (PlayerDeathEvent event) {
+        
+        Player player = event.getEntity();
+        Location loc = player.getLocation();
+        
+        setBackLoc(player.getName(), loc);
+        
+    }
+    
     @EventHandler (priority = EventPriority.NORMAL)
     public void onPlayerTeleport (PlayerTeleportEvent event) {
         if (!event.isCancelled()) {
