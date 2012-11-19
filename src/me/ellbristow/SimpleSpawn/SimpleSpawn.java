@@ -1438,7 +1438,7 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
         removeImmuneFromJail(player);
 
         if (isJailed(player.getName())) {
-            getLogger().fine("Player "+player.getName()+" was send to jail.");
+            getLogger().fine("Player "+player.getName()+" was send to jail during join.");
             simpleTeleport(player, getJail(getWhereJailed(player.getName())));
             getServer().broadcastMessage(player.getName() + ChatColor.GOLD + " has been jailed!");
         }
@@ -1447,30 +1447,29 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
     @EventHandler (priority = EventPriority.NORMAL)
     public void onPlayerRespawn (PlayerRespawnEvent event) {
         Player player = event.getPlayer();
-        Location respawn;
+        Location respawn=null;
         removeImmuneFromJail(player);
         
         if (isJailed(player.getName())) {
             respawn=getJail(getWhereJailed(player.getName()));
             getLogger().fine("Player "+player.getName()+" was send to jail.");
-            getServer().broadcastMessage(player.getName() + ChatColor.GOLD + " has been jailed!");
+            getServer().broadcastMessage(player.getName() + ChatColor.GOLD + " has been jailed for respawn!");
         } else {
         	if(event.isBedSpawn() && !setHomeWithBeds) {
-                getLogger().fine("Player "+player.getName()+" get bed spawn location.");
+                getLogger().fine("Player "+player.getName()+" get bed spawn location for respawn.");
         		respawn = player.getBedSpawnLocation();
         	}
         	else { 
-                getLogger().fine("Player "+player.getName()+" get home location.");
+                getLogger().fine("Player "+player.getName()+" get home location for respawn.");
         		respawn = getHomeLoc(player);
         	}
         }
 
         if (respawn == null) {
-            getLogger().fine("Player "+player.getName()+" no location for respawn found, using world spawn location.");
+            getLogger().fine("Player "+player.getName()+" no location for respawn found, using world spawn location for respawn.");
         	respawn = player.getWorld().getSpawnLocation();
         }
         event.setRespawnLocation(respawn);
-
     }
 
     public void removeImmuneFromJail(Player player) {
@@ -1496,7 +1495,7 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
             		} else {
             			setBedLoc(player);
                         getLogger().finer("Player "+player.getName()+" your home is set to bed location.");
-            			player.sendMessage(ChatColor.GOLD + "Your home has been set to this location!");
+            			player.sendMessage(ChatColor.GOLD + "Your home has been set to this bed location!");
             		}
             	}
         	} else {
