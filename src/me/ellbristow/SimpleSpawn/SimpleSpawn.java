@@ -1022,7 +1022,7 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
         return false;
     }
 
-    public void simpleTeleport(Player player, Location loc) {
+    public void simpleTeleport(final Player player, final Location loc) {
     	if (loc == null)
             return;
     	
@@ -1030,12 +1030,17 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
         playSound(fromLoc);
         playEffect(fromLoc);
         
-        player.teleport(loc, TeleportCause.PLUGIN);
-        getLogger().finer("Player "+player.getName()+" teleported");
+        getServer().getScheduler().scheduleAsyncDelayedTask(this, new Runnable() {
+            @Override
+            public void run() {
+                player.teleport(loc, TeleportCause.PLUGIN);
+                getLogger().finer("Player "+player.getName()+" teleported");
 
-        playSound(loc);
-        playEffect(loc);
-        player.sendMessage(ChatColor.GOLD + "WHOOSH!");
+                playSound(loc);
+                playEffect(loc);
+                player.sendMessage(ChatColor.GOLD + "WHOOSH!");
+            }
+        }, 10L);
     }
    
     public void setBackLoc(String playerName, Location loc) {
@@ -1429,17 +1434,27 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
 
     @EventHandler (priority = EventPriority.NORMAL)
     public void onPlayerJoin (PlayerJoinEvent event) {
-        Player player = event.getPlayer();
+        final Player player = event.getPlayer();
         if (!player.hasPlayedBefore()) {
             getLogger().fine("Player "+player.getName()+" has never played before and was send to default spawn.");
-        	simpleTeleport(player, getDefaultSpawn());
+            getServer().getScheduler().scheduleAsyncDelayedTask(this, new Runnable() {
+                @Override
+                public void run() {
+                    simpleTeleport(player, getDefaultSpawn());
+                }
+            });
             return;
         }
         removeImmuneFromJail(player);
 
         if (isJailed(player.getName())) {
             getLogger().fine("Player "+player.getName()+" was send to jail during join.");
-            simpleTeleport(player, getJail(getWhereJailed(player.getName())));
+            getServer().getScheduler().scheduleAsyncDelayedTask(this, new Runnable() {
+                @Override
+                public void run() {
+                    simpleTeleport(player, getJail(getWhereJailed(player.getName())));
+                }
+            });
             getServer().broadcastMessage(player.getName() + ChatColor.GOLD + " has been jailed!");
         }
     }
