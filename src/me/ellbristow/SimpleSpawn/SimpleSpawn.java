@@ -52,7 +52,10 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
     private String[] releaseDims = {"TEXT NOT NULL PRIMARY KEY", "TEXT NOT NULL", "DOUBLE NOT NULL DEFAULT 0", "DOUBLE NOT NULL DEFAULT 0", "DOUBLE NOT NULL DEFAULT 0", "FLOAT NOT NULL DEFAULT 0", "FLOAT NOT NULL DEFAULT 0"};
     private String[] jailedColumns = {"player", "jailName"};
     private String[] jailedDims = {"TEXT NOT NULL PRIMARY KEY", "TEXT NOT NULL"};
-
+    private String[] pendingColumns = {"requestPlayer", "targetPlayer"};
+    private String[] pendingDims = {"TEXT NOT NULL PRIMARY KEY", "TEXT NOT NULL"};
+    
+    
     @Override
     public void onDisable() {
         SSdb.close();
@@ -144,6 +147,10 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
             getLogger().info("Created table Jails in SimpleSpawn.db");
             SSdb.createTable("Jails", jailColumns, jailDims);
         }
+        if (!SSdb.checkTable("PendingTP")) {
+            getLogger().info("Created table PendingTP in SimpleSpawn.db");
+            SSdb.createTable("PendingTP", pendingColumns, pendingDims);
+        }
         if (!SSdb.checkTable("Releases")) {
             getLogger().info("Created table Releases in SimpleSpawn.db");
             SSdb.createTable("Releases", releaseColumns, releaseDims);
@@ -155,6 +162,14 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
 
         PluginManager pm = getServer().getPluginManager();
         pm.registerEvents(this, this);
+        
+        try {
+            Metrics metrics = new Metrics(this);
+            metrics.start();
+        } catch (IOException e) {
+            // Failed to submit the stats :-(
+        }
+        
         getLogger().info("SimpleSpawn enabled.");
     }
 
@@ -298,7 +313,7 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
                     return false;
                 }
                 OfflinePlayer target = getServer().getOfflinePlayer(args[0]);
-                if (!target.hasPlayedBefore() && !player.isOnline()) {
+                if (!target.hasPlayedBefore() && !target.isOnline()) {
                     getLogger().fine("Player " + player.getName() + " tries to go to home location of unkown user " + target.getName() + ".");
                     player.sendMessage(ChatColor.RED + "Player '" + ChatColor.WHITE + args[0] + ChatColor.RED + "' not found!");
                     return false;
@@ -348,7 +363,7 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
                 }
 
                 OfflinePlayer target = getServer().getOfflinePlayer(args[0]);
-                if (!target.hasPlayedBefore() && !player.isOnline()) {
+                if (!target.hasPlayedBefore() && !target.isOnline()) {
                     getLogger().fine("Player " + player.getName() + " tries to set home location for unkown user " + target.getName() + ".");
                     player.sendMessage(ChatColor.RED + "Player '" + ChatColor.WHITE + args[0] + ChatColor.RED + "' not found!");
                     return true;
@@ -391,7 +406,7 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
                     return false;
                 }
                 OfflinePlayer target = getServer().getOfflinePlayer(args[0]);
-                if (!target.hasPlayedBefore() && !player.isOnline()) {
+                if (!target.hasPlayedBefore() && !target.isOnline()) {
                     getLogger().fine("Player " + player.getName() + " tries to go to home location of unkown user " + target.getName() + ".");
                     player.sendMessage(ChatColor.RED + "Player '" + ChatColor.WHITE + args[0] + ChatColor.RED + "' not found!");
                     return false;
@@ -440,7 +455,7 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
                     return false;
                 }
                 OfflinePlayer target = getServer().getOfflinePlayer(args[0]);
-                if (!target.hasPlayedBefore() && !player.isOnline()) {
+                if (!target.hasPlayedBefore() && !target.isOnline()) {
                     getLogger().fine("Player " + player.getName() + " tries to remove home location of unkown user " + target.getName() + ".");
                     player.sendMessage(ChatColor.RED + "Player '" + ChatColor.WHITE + args[0] + ChatColor.RED + "' not found!");
                     return false;
@@ -483,7 +498,7 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
                     return false;
                 }
                 OfflinePlayer target = getServer().getOfflinePlayer(args[0]);
-                if (!target.hasPlayedBefore() && !player.isOnline()) {
+                if (!target.hasPlayedBefore() && !target.isOnline()) {
                     getLogger().fine("Player " + player.getName() + " tries to set work location for unkown user " + target.getName() + ".");
                     player.sendMessage(ChatColor.RED + "Player '" + ChatColor.WHITE + args[0] + ChatColor.RED + "' not found!");
                     return false;
@@ -526,7 +541,7 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
                     return false;
                 }
                 OfflinePlayer target = getServer().getOfflinePlayer(args[0]);
-                if (!target.hasPlayedBefore() && !player.isOnline()) {
+                if (!target.hasPlayedBefore() && !target.isOnline()) {
                     getLogger().fine("Player " + player.getName() + " tries to remove work location for unkown user " + target.getName() + ".");
                     player.sendMessage(ChatColor.RED + "Player '" + ChatColor.WHITE + args[0] + ChatColor.RED + "' not found!");
                     return false;
@@ -574,7 +589,7 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
                     return false;
                 }
                 OfflinePlayer target = getServer().getOfflinePlayer(args[0]);
-                if (!target.hasPlayedBefore() && !player.isOnline()) {
+                if (!target.hasPlayedBefore() && !target.isOnline()) {
                     getLogger().fine("Player " + player.getName() + " tries to go to the work location of unkown user " + target.getName() + ".");
                     player.sendMessage(ChatColor.RED + "Player '" + ChatColor.WHITE + args[0] + ChatColor.RED + "' not found!");
                     return false;
@@ -743,7 +758,7 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
                     return false;
                 }
                 OfflinePlayer target = getServer().getOfflinePlayer(args[0]);
-                if (!target.hasPlayedBefore() && !player.isOnline()) {
+                if (!target.hasPlayedBefore() && !target.isOnline()) {
                     getLogger().fine("Player " + player.getName() + " tries to send unkown user " + args[0] + " to the default jail.");
                     player.sendMessage(ChatColor.RED + "Player '" + ChatColor.WHITE + args[0] + ChatColor.RED + "' not found!");
                     return false;
@@ -780,7 +795,7 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
                     return false;
                 }
                 OfflinePlayer target = getServer().getOfflinePlayer(args[0]);
-                if (!target.hasPlayedBefore() && !player.isOnline()) {
+                if (!target.hasPlayedBefore() && !target.isOnline()) {
                     getLogger().fine("Player " + player.getName() + " tries to send unkown user " + args[0] + " to jail " + args[1] + ".");
                     player.sendMessage(ChatColor.RED + "Player '" + ChatColor.WHITE + args[0] + ChatColor.RED + "' not found!");
                     return false;
@@ -824,7 +839,7 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
 
             if (args.length == 1) {
                 OfflinePlayer target = getServer().getOfflinePlayer(args[0]);
-                if (!target.hasPlayedBefore() && !player.isOnline()) {
+                if (!target.hasPlayedBefore() && !target.isOnline()) {
                     getLogger().fine("Player " + player.getName() + " tries to release unknown user " + args[0] + ".");
                     player.sendMessage(ChatColor.RED + "Player '" + ChatColor.WHITE + args[0] + ChatColor.RED + "' not found!");
                     return false;
@@ -1017,6 +1032,105 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
             getLogger().finer("Player " + player.getName() + " lists all jails.");
             player.sendMessage(jailMessage);
             return true;
+        } else if (commandLabel.equalsIgnoreCase("tpto") || commandLabel.equalsIgnoreCase("tpt")) {
+            if (!(sender instanceof Player)) {
+                getLogger().fine("Command " + commandLabel + " cannot be run from the console.");
+                sender.sendMessage("Sorry! Command " + commandLabel + " cannot be run from the console!");
+                return false;
+            }
+            if (!player.hasPermission("simplespawn.tpto")) {
+                getLogger().fine("Player " + player.getName() + " has no simplespawn.tpto permission.");
+                player.sendMessage(ChatColor.RED + "You do not have permission to use that command!");
+                return false;
+            }
+            if (args.length < 1) {
+                player.sendMessage(ChatColor.RED + "You must specify a player to tp to!");
+                player.sendMessage(ChatColor.RED + "Try: /tpto [playerName]");
+                return false;
+            }
+            Player target = getServer().getPlayer(args[0]);
+            if (target == null) {
+                getLogger().fine("Player " + player.getName() + " tries to tp to offline user " + args[0] + ".");
+                player.sendMessage(ChatColor.RED + "Player '" + ChatColor.WHITE + args[0] + ChatColor.RED + "' not online!");
+                return false;
+            }
+            SSdb.query("INSERT OR REPLACE INTO PendingTP (requestPlayer, targetPlayer) VALUES ('"+player.getName()+"','"+target.getName()+"')");
+            player.sendMessage(ChatColor.GOLD + "Your teleport request has been sent to " + ChatColor.WHITE + target.getName());
+            target.sendMessage(ChatColor.WHITE + player.getName() + ChatColor.GOLD + " wants to teleport to you!");
+            target.sendMessage(ChatColor.GOLD + "You can "+ChatColor.WHITE+"/tpaccept"+ChatColor.GOLD+" or "+ChatColor.WHITE+"/tpdeny");
+            return true;
+        } else if (commandLabel.equalsIgnoreCase("tpcancel") || commandLabel.equalsIgnoreCase("tpc")) {
+            if (!(sender instanceof Player)) {
+                getLogger().fine("Command " + commandLabel + " cannot be run from the console.");
+                sender.sendMessage("Sorry! Command " + commandLabel + " cannot be run from the console!");
+                return false;
+            }
+            HashMap<Integer, HashMap<String, Object>> results = SSdb.select("targetPlayer", "PendingTP", "requestPlayer = '"+player.getName()+"'", "", "");
+            if (results.isEmpty()) {
+                player.sendMessage(ChatColor.RED + "You have no pending teleport requests");
+                return true;
+            }
+            String targetName = results.get(0).get("targetPlayer").toString();
+            Player target = getServer().getPlayer(targetName);
+            SSdb.query("DELETE FROM PendingTP WHERE requestPlayer = '"+player.getName()+"'");
+            player.sendMessage(ChatColor.GOLD + "Teleport request cancelled!");
+            if (target != null) {
+                target.sendMessage(player.getName() + ChatColor.GOLD + " cancelled their teleport request!");
+            }
+            return true;
+        } else if (commandLabel.equalsIgnoreCase("tpaccept") || commandLabel.equalsIgnoreCase("tpa")) {
+            if (!(sender instanceof Player)) {
+                getLogger().fine("Command " + commandLabel + " cannot be run from the console.");
+                sender.sendMessage("Sorry! Command " + commandLabel + " cannot be run from the console!");
+                return false;
+            }
+            getLogger().fine("Player " + player.getName() + " tries to accept tp requests.");
+            HashMap<Integer, HashMap<String, Object>> results = SSdb.select("requestPlayer", "PendingTP", "targetPlayer = '"+player.getName()+"'", "", "");
+            if (results.isEmpty()) {
+                getLogger().fine("Player " + player.getName() + " has no pending tp requests.");
+                player.sendMessage(ChatColor.RED + "You have no pending teleport requests");
+                return true;
+            }
+            boolean found = false;
+            for (HashMap<String, Object> result : results.values()) {
+                String requestName = result.get("requestPlayer").toString();
+                Player requester = getServer().getPlayer(requestName);
+                if (requester != null) {
+                    requester.sendMessage(player.getName() + ChatColor.GOLD + " accepted your teleport request!");
+                    simpleTeleport(requester, player.getLocation());
+                    found = true;
+                }
+                SSdb.query("DELETE FROM PendingTP WHERE requestPlayer = '"+requestName+"'");
+            }
+            if (!found) {
+                player.sendMessage(ChatColor.RED + "Requesting player is no longer online!");
+            } else {
+                player.sendMessage(ChatColor.GOLD + "Requesting player(s) teleported!");
+            }
+            return true;
+        } else if (commandLabel.equalsIgnoreCase("tpdeny") || commandLabel.equalsIgnoreCase("tpd")) {
+            if (!(sender instanceof Player)) {
+                getLogger().fine("Command " + commandLabel + " cannot be run from the console.");
+                sender.sendMessage("Sorry! Command " + commandLabel + " cannot be run from the console!");
+                return false;
+            }
+            getLogger().fine("Player " + player.getName() + " tries to deny tp requests.");
+            HashMap<Integer, HashMap<String, Object>> results = SSdb.select("requestPlayer", "PendingTP", "targetPlayer = '"+player.getName()+"'", "", "");
+            if (results.isEmpty()) {
+                getLogger().fine("Player " + player.getName() + " has no pending tp requests.");
+                player.sendMessage(ChatColor.RED + "You have no pending teleport requests");
+                return true;
+            }
+            for (HashMap<String, Object> result : results.values()) {
+                String requestName = result.get("requestPlayer").toString();
+                Player requester = getServer().getPlayer(requestName);
+                if (requester != null) {
+                    requester.sendMessage(player.getName() + ChatColor.RED + " denied your teleport request!");
+                }
+                SSdb.query("DELETE FROM PendingTP WHERE requestPlayer = '"+requestName+"'");
+            }
+            player.sendMessage(ChatColor.GOLD + "All pending teleport request(s) denied!");
+            return true;
         }
         return false;
     }
@@ -1031,19 +1145,21 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
 
         playSound(fromLoc);
         playEffect(fromLoc);
-
+        
+        if (!loc.getChunk().isLoaded()) {
+            loc.getChunk().load();
+        }
+        
+        player.teleport(loc, TeleportCause.PLUGIN);
+        getLogger().finer("Player " + player.getName() + " teleported");
         getServer().getScheduler().scheduleAsyncDelayedTask(this, new Runnable() {
-
-            @Override
+            @Override 
             public void run() {
-                player.teleport(loc, TeleportCause.PLUGIN);
-                getLogger().finer("Player " + player.getName() + " teleported");
-
                 playSound(loc);
                 playEffect(loc);
-                player.sendMessage(ChatColor.GOLD + "WHOOSH!");
             }
-        }, 10L);
+        });
+        player.sendMessage(ChatColor.GOLD + "WHOOSH!");
     }
 
     public void setBackLoc(String playerName, Location loc) {
@@ -1105,11 +1221,17 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
 
     public Location getHomeLoc(String playerName) {
         HashMap<Integer, HashMap<String, Object>> result = SSdb.select("world, x, y, z, yaw, pitch", "PlayerHomes", "player = '" + playerName + "'", null, null);
-        Location location;
+        Location location = null;
         if (result == null || result.isEmpty()) {
             // if you haven't used /sethome - first home is your bed
             getLogger().finest("No home found for " + playerName + ", trying to retrieve bedspawn.");
-            location = getServer().getOfflinePlayer(playerName).getBedSpawnLocation();
+            OfflinePlayer player = getServer().getOfflinePlayer(playerName);
+            if (player.hasPlayedBefore() || player.isOnline()) {
+                location = player.getBedSpawnLocation();
+                if (location == null) {
+                    location = getDefaultSpawn();
+                }
+            }
         } else {
             String world = (String) result.get(0).get("world");
             double x = (Double) result.get(0).get("x");
@@ -1441,26 +1563,14 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
         final Player player = event.getPlayer();
         if (!player.hasPlayedBefore() && !player.isOnline()) {
             getLogger().fine("Player " + player.getName() + " has never played before and was send to default spawn.");
-            getServer().getScheduler().scheduleAsyncDelayedTask(this, new Runnable() {
-
-                @Override
-                public void run() {
-                    simpleTeleport(player, getDefaultSpawn());
-                }
-            });
+            simpleTeleport(player, getDefaultSpawn());
             return;
         }
         removeImmuneFromJail(player);
 
         if (isJailed(player.getName())) {
             getLogger().fine("Player " + player.getName() + " was send to jail during join.");
-            getServer().getScheduler().scheduleAsyncDelayedTask(this, new Runnable() {
-
-                @Override
-                public void run() {
-                    simpleTeleport(player, getJail(getWhereJailed(player.getName())));
-                }
-            });
+            simpleTeleport(player, getJail(getWhereJailed(player.getName())));
             getServer().broadcastMessage(player.getName() + ChatColor.GOLD + " has been jailed!");
         }
     }

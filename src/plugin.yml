@@ -1,6 +1,6 @@
 name: SimpleSpawn
 main: me.ellbristow.SimpleSpawn.SimpleSpawn
-version: 2.0.18
+version: 2.1.0
 database: true
 author: ellbristow, dh1jc
 dev-url: http://dev.bukkit.org/server-mods/simplespawn
@@ -57,7 +57,22 @@ commands:
     usage: /jails
   release:
     description: Release a player from jail
-    usage: /release player
+    usage: /release {player}
+  tpto:
+    description: Teleport to a player with their permission
+    usage: /tpto {player}
+  tpaccept:
+    description: Accept pending teleport request
+    usage: /tpaccept
+    aliases: [tpa]
+  tpcancel:
+    description: Cancel pending teleport request
+    usage: /tpcancel
+    aliases: [tpc]
+  tpdeny:
+    description: Deny pending teleport request
+    usage: /tpdeny
+    aliases: [tpd]
   inmates:
     description: Lists inmates of a jail
     usage: /inmates {jailName}
@@ -126,7 +141,7 @@ permissions:
     description: Access to /setspawn
   simplespawn.set.default:
     default: op
-    description: Access to /setspawn default
+    description: Access to /setspawn *default
   simplespawn.use:
     default: op
     description: Access to /spawn
@@ -208,3 +223,6 @@ permissions:
   simplespawn.jail.immune:
     default: op
     description: Player can't be jailed
+  simplespawn.tpto:
+    default: op
+    description: Player can use /tpto
