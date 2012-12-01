@@ -1,6 +1,6 @@
 name: SimpleSpawn
 main: me.ellbristow.SimpleSpawn.SimpleSpawn
-version: 2.1.0
+version: 2.1.1
 database: true
 author: ellbristow, dh1jc
 dev-url: http://dev.bukkit.org/server-mods/simplespawn
@@ -93,6 +93,7 @@ permissions:
       simplespawn.jail.*: true
       simplespawn.release.*: true
       simplespawn.back: true
+      simplespawn.tpto: true
   simplespawn.home.*:
     description: Access to /home and /sethome, /removehome
     children:

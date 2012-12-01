@@ -1561,7 +1561,7 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
     @EventHandler(priority = EventPriority.NORMAL)
     public void onPlayerJoin(PlayerJoinEvent event) {
         final Player player = event.getPlayer();
-        if (!player.hasPlayedBefore() && !player.isOnline()) {
+        if (!player.hasPlayedBefore()) {
             getLogger().fine("Player " + player.getName() + " has never played before and was send to default spawn.");
             simpleTeleport(player, getDefaultSpawn());
             return;
