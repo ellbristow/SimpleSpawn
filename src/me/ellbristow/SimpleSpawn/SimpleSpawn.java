@@ -4,6 +4,9 @@ import java.io.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
+import me.ellbristow.SimpleSpawn.events.SimpleSpawnChangeLocationEvent;
+import me.ellbristow.SimpleSpawn.events.SimpleSpawnChangeLocationEvent.LocationType;
+import me.ellbristow.SimpleSpawn.events.SimpleSpawnRemoveLocationEvent;
 import org.bukkit.*;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -30,7 +33,7 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
 
     public static SimpleSpawn plugin;
     protected FileConfiguration config;
-    private SQLBridge SSdb;
+    private static SQLBridge SSdb;
     private int tpEffect = 1;
     private int soundEffect = 1;
     private boolean useTpSound = true;
@@ -1017,17 +1020,17 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
                 return true;
             }
 
-            String jailMessage = ChatColor.GOLD + "Jails: ";
+            String jailMessage = ChatColor.GOLD + "" + jailList.size() + " Jails: ";
             for (int i = 0; i < jailList.size(); i++) {
-                if (i != 0) {
+                if (!jailMessage.equals(ChatColor.GOLD + "" + jailList.size() + " Jails: ")) {
                     jailMessage += ChatColor.GOLD + ", ";
                 }
                 String jailName = jailList.get(i).get("name").toString();
                 jailMessage += ChatColor.WHITE + jailName;
-                int inMates = getInMates(jailName);
-                if (inMates != 0) {
-                    jailMessage += ChatColor.GRAY + " (Inmates: " + inMates + ")";
-                }
+                //int inMates = getInMates(jailName);
+                //if (inMates != 0) {
+                    //jailMessage += ChatColor.GRAY + " (Inmates: " + inMates + ")";
+                //}
             }
             getLogger().finer("Player " + player.getName() + " lists all jails.");
             player.sendMessage(jailMessage);
@@ -1173,12 +1176,16 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
     }
 
     public void setBedLoc(Player player) {
+        SimpleSpawnChangeLocationEvent e = new SimpleSpawnChangeLocationEvent(player.getName(), LocationType.HOME, player.getLocation());
+        getServer().getPluginManager().callEvent(e);
         Location homeLoc = player.getLocation();
         setHomeLoc(player);
         player.setBedSpawnLocation(homeLoc);
     }
 
     public void setHomeLoc(Player player) {
+        SimpleSpawnChangeLocationEvent e = new SimpleSpawnChangeLocationEvent(player.getName(), LocationType.HOME, player.getLocation());
+        getServer().getPluginManager().callEvent(e);
         Location homeLoc = player.getLocation();
         String world = homeLoc.getWorld().getName();
         double x = homeLoc.getX();
@@ -1190,6 +1197,8 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
     }
 
     public void setOtherHomeLoc(OfflinePlayer target, Player player) {
+        SimpleSpawnChangeLocationEvent e = new SimpleSpawnChangeLocationEvent(target.getName(), LocationType.HOME, player.getLocation());
+        getServer().getPluginManager().callEvent(e);
         Location homeLoc = player.getLocation();
         String world = homeLoc.getWorld().getName();
         double x = homeLoc.getX();
@@ -1257,6 +1266,8 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
     }
 
     public void setWorkLoc(Player player) {
+        SimpleSpawnChangeLocationEvent e = new SimpleSpawnChangeLocationEvent(player.getName(), LocationType.WORK, player.getLocation());
+        getServer().getPluginManager().callEvent(e);
         Location homeLoc = player.getLocation();
         String world = homeLoc.getWorld().getName();
         double x = homeLoc.getX();
@@ -1268,6 +1279,8 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
     }
 
     public void setOtherWorkLoc(OfflinePlayer target, Player player) {
+        SimpleSpawnChangeLocationEvent e = new SimpleSpawnChangeLocationEvent(target.getName(), LocationType.WORK, player.getLocation());
+        getServer().getPluginManager().callEvent(e);
         Location homeLoc = player.getLocation();
         String world = homeLoc.getWorld().getName();
         double x = homeLoc.getX();
@@ -1301,6 +1314,8 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
     }
 
     public void setJail(String jailName, Location loc) {
+        SimpleSpawnChangeLocationEvent e = new SimpleSpawnChangeLocationEvent(jailName, LocationType.JAIL, loc);
+        getServer().getPluginManager().callEvent(e);
         jailName = jailName.toLowerCase();
         String world = loc.getWorld().getName();
         double x = loc.getX();
@@ -1331,6 +1346,8 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
     }
 
     public void setRelease(String releaseName, Location loc) {
+        SimpleSpawnChangeLocationEvent e = new SimpleSpawnChangeLocationEvent(releaseName, LocationType.RELEASE, loc);
+        getServer().getPluginManager().callEvent(e);
         releaseName = releaseName.toLowerCase();
         String world = loc.getWorld().getName();
         double x = loc.getX();
@@ -1416,23 +1433,33 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
     }
 
     public void removeHome(String playerName) {
+        SimpleSpawnRemoveLocationEvent e = new SimpleSpawnRemoveLocationEvent(playerName, LocationType.HOME);
+        getServer().getPluginManager().callEvent(e);
         SSdb.query("DELETE FROM PlayerHomes WHERE player='" + playerName + "' ");
     }
 
     public void removeWork(String playerName) {
+        SimpleSpawnRemoveLocationEvent e = new SimpleSpawnRemoveLocationEvent(playerName, LocationType.WORK);
+        getServer().getPluginManager().callEvent(e);
         SSdb.query("DELETE FROM PlayerWorks WHERE player='" + playerName + "' ");
     }
 
     public void removeJail(String jailName) {
+        SimpleSpawnRemoveLocationEvent e = new SimpleSpawnRemoveLocationEvent(jailName, LocationType.JAIL);
+        getServer().getPluginManager().callEvent(e);
         SSdb.query("DELETE FROM Jails WHERE name='" + jailName + "' ");
     }
 
     public void removeRelease(String releaseName) {
+        SimpleSpawnRemoveLocationEvent e = new SimpleSpawnRemoveLocationEvent(releaseName, LocationType.RELEASE);
+        getServer().getPluginManager().callEvent(e);
         SSdb.query("DELETE FROM Releases WHERE name='" + releaseName + "' ");
     }
 
     // ONLY FOR NEW PLAYERS
     public void setDefaultSpawn(Location location) {
+        SimpleSpawnChangeLocationEvent e = new SimpleSpawnChangeLocationEvent(location.getWorld().getName(), LocationType.WORLD_SPAWN, location);
+        getServer().getPluginManager().callEvent(e);
         String world = location.getWorld().getName();
         double x = location.getX();
         double y = location.getY();
@@ -1463,6 +1490,8 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
     }
 
     public void setWorldSpawn(Location location) {
+        SimpleSpawnChangeLocationEvent e = new SimpleSpawnChangeLocationEvent(location.getWorld().getName(), LocationType.WORLD_SPAWN, location);
+        getServer().getPluginManager().callEvent(e);
         String world = location.getWorld().getName();
         double x = location.getX();
         double y = location.getY();
@@ -1578,7 +1607,7 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
     @EventHandler(priority = EventPriority.NORMAL)
     public void onPlayerRespawn(PlayerRespawnEvent event) {
         Player player = event.getPlayer();
-        Location respawn = null;
+        Location respawn;
         removeImmuneFromJail(player);
 
         if (isJailed(player.getName())) {
@@ -1795,6 +1824,7 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
     }
 
     public void playEffect(Location loc) {
+        loc = loc.clone();
         if (useTpEffect) {
             switch (tpEffect) {
                 case 0:
@@ -1817,4 +1847,80 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
             }
         }
     }
+    
+    public static HashMap<String, Location> getHomes() {
+        HashMap<String, Location> homes = new HashMap<String, Location>();
+        HashMap<Integer, HashMap<String, Object>> results = SSdb.select("player, world, x, y, z", "PlayerHomes", null, null, null);
+        for (HashMap<String, Object> loc : results.values()) {
+            String playerName = loc.get("player").toString();
+            World world = Bukkit.getWorld(loc.get("world").toString());
+            double x = (Double)loc.get("x");
+            double y = (Double)loc.get("y");
+            double z = (Double)loc.get("z");
+            Location homeLoc = new Location(world, x, y, z);
+            homes.put(playerName, homeLoc);
+        }
+        return homes;
+    }
+    
+    public static HashMap<String, Location> getWorks() {
+        HashMap<String, Location> works = new HashMap<String, Location>();
+        HashMap<Integer, HashMap<String, Object>> results = SSdb.select("player, world, x, y, z", "PlayerWorks", null, null, null);
+        for (HashMap<String, Object> loc : results.values()) {
+            String playerName = loc.get("player").toString();
+            World world = Bukkit.getWorld(loc.get("world").toString());
+            double x = (Double)loc.get("x");
+            double y = (Double)loc.get("y");
+            double z = (Double)loc.get("z");
+            Location workLoc = new Location(world, x, y, z);
+            works.put(playerName, workLoc);
+        }
+        return works;
+    }
+    
+    public static HashMap<String, Location> getJails() {
+        HashMap<String, Location> jails = new HashMap<String, Location>();
+        HashMap<Integer, HashMap<String, Object>> results = SSdb.select("name, world, x, y, z", "Jails", null, null, null);
+        for (HashMap<String, Object> loc : results.values()) {
+            String jailName = loc.get("name").toString();
+            World world = Bukkit.getWorld(loc.get("world").toString());
+            double x = (Double)loc.get("x");
+            double y = (Double)loc.get("y");
+            double z = (Double)loc.get("z");
+            Location workLoc = new Location(world, x, y, z);
+            jails.put(jailName, workLoc);
+        }
+        return jails;
+    }
+    
+    public static HashMap<String, Location> getReleases() {
+        HashMap<String, Location> releases = new HashMap<String, Location>();
+        HashMap<Integer, HashMap<String, Object>> results = SSdb.select("name, world, x, y, z", "Releases", null, null, null);
+        for (HashMap<String, Object> loc : results.values()) {
+            String releaseName = loc.get("name").toString();
+            World world = Bukkit.getWorld(loc.get("world").toString());
+            double x = (Double)loc.get("x");
+            double y = (Double)loc.get("y");
+            double z = (Double)loc.get("z");
+            Location workLoc = new Location(world, x, y, z);
+            releases.put(releaseName, workLoc);
+        }
+        return releases;
+    }
+    
+    public static HashMap<String, Location> getWorldSpawns() {
+        HashMap<String, Location> worlds = new HashMap<String, Location>();
+        HashMap<Integer, HashMap<String, Object>> results = SSdb.select("world, x, y, z", "Releases", null, null, null);
+        for (HashMap<String, Object> loc : results.values()) {
+            String worldName = loc.get("world").toString();
+            World world = Bukkit.getWorld(loc.get("world").toString());
+            double x = (Double)loc.get("x");
+            double y = (Double)loc.get("y");
+            double z = (Double)loc.get("z");
+            Location workLoc = new Location(world, x, y, z);
+            worlds.put(worldName, workLoc);
+        }
+        return worlds;
+    }
+    
 }
