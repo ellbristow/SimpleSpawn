@@ -3,17 +3,18 @@ package me.ellbristow.SimpleSpawn;
 import java.io.File;
 import java.sql.*;
 import java.util.HashMap;
+import org.bukkit.plugin.Plugin;
 
 public class SQLBridge {
 
-    private static SimpleSpawn plugin;
+    private static Plugin plugin;
     private Connection conn;
     private File sqlFile;
     private Statement statement;
     private HashMap<Integer, HashMap<String, Object>> rows = new HashMap<Integer, HashMap<String, Object>>();
     private int numRows = 0;
     
-    public SQLBridge (SimpleSpawn instance) {
+    public SQLBridge (Plugin instance) {
         plugin = instance;
         sqlFile = new File(plugin.getDataFolder() + File.separator + plugin.getName() + ".db");
     }

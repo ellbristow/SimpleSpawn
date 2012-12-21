@@ -58,7 +58,6 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
     private String[] pendingColumns = {"requestPlayer", "targetPlayer"};
     private String[] pendingDims = {"TEXT NOT NULL PRIMARY KEY", "TEXT NOT NULL"};
     
-    
     @Override
     public void onDisable() {
         SSdb.close();
@@ -217,10 +216,10 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
                     }
                     setDefaultSpawn(player.getLocation());
                     getLogger().finer("Player " + player.getName() + " sets a default spawn location.");
-                    player.sendMessage(ChatColor.GOLD + "Spawn for new players been set to this location for new players!");
+                    player.sendMessage(ChatColor.GOLD + "Spawn for new players been set to this location!");
                     return true;
                 } else {
-                    getLogger().fine("Player " + player.getName() + " cannot set a default spawn location while in jail.");
+                    getLogger().fine("Player " + player.getName() + " entered /setspawn incorrectly.");
                     player.sendMessage(ChatColor.RED + "Command not recognised!");
                     player.sendMessage(ChatColor.RED + "Try: /setspawn OR /setspawn *default");
                     return false;
@@ -1149,13 +1148,13 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
         playSound(fromLoc);
         playEffect(fromLoc);
         
-        if (!loc.getChunk().isLoaded()) {
-            loc.getChunk().load();
+        if (!loc.getWorld().getChunkAt(loc).isLoaded()) {
+            loc.getWorld().getChunkAt(loc).load();
         }
         
         player.teleport(loc, TeleportCause.PLUGIN);
         getLogger().finer("Player " + player.getName() + " teleported");
-        getServer().getScheduler().scheduleAsyncDelayedTask(this, new Runnable() {
+        getServer().getScheduler().runTaskAsynchronously(this, new Runnable() {
             @Override 
             public void run() {
                 playSound(loc);
@@ -1466,7 +1465,8 @@ public class SimpleSpawn extends JavaPlugin implements Listener {
         double z = location.getZ();
         float yaw = location.getYaw();
         float pitch = location.getPitch();
-        SSdb.query("INSERT OR REPLACE INTO DefaultSpawn (world, x, y, z, yaw, pitch) VALUES ('" + world + "', " + x + ", " + y + ", " + z + ", " + yaw + ", " + pitch + ")");
+        SSdb.query("DELETE FROM DefaultSpawn");
+        SSdb.query("INSERT INTO DefaultSpawn (world, x, y, z, yaw, pitch) VALUES ('" + world + "', " + x + ", " + y + ", " + z + ", " + yaw + ", " + pitch + ")");
         location.getWorld().setSpawnLocation((int) x, (int) y, (int) z);
     }
 
